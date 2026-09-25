@@ -1140,11 +1140,11 @@ export const useStore = create<CMSState>()(
             supabase.from('exams').select('*'),
           ]);
 
-          if (studentsErr) console.error("Error fetching students:", studentsErr);
-          if (teachersErr) console.error("Error fetching teachers:", teachersErr);
-          if (attendancesErr) console.error("Error fetching attendances:", attendancesErr);
-          if (paymentsErr) console.error("Error fetching payments:", paymentsErr);
-          if (examsErr) console.error("Error fetching exams:", examsErr);
+          if (studentsErr) console.warn("Error fetching students:", studentsErr);
+          if (teachersErr) console.warn("Error fetching teachers:", teachersErr);
+          if (attendancesErr) console.warn("Error fetching attendances:", attendancesErr);
+          if (paymentsErr) console.warn("Error fetching payments:", paymentsErr);
+          if (examsErr) console.warn("Error fetching exams:", examsErr);
 
           if (students && students.length > 0) set({ students: students as any });
           if (teachers && teachers.length > 0) set({ teachers: teachers as any });
@@ -1152,7 +1152,7 @@ export const useStore = create<CMSState>()(
           if (payments && payments.length > 0) set({ payments: payments as any });
           if (exams && exams.length > 0) set({ exams: exams as any });
         } catch (error) {
-          console.error("Failed to fetch Supabase data:", error);
+          console.warn("Failed to fetch Supabase data. Using local fallbacks:", error);
         }
       },
 

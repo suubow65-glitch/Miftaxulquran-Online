@@ -29,11 +29,11 @@ type HeatStatus = "attended" | "absent" | "leave" | "none";
 export default function TrackPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const students       = useStore(s => s.students);
-  const attendanceLogs = useStore(s => s.attendanceLogs);
-  const teachers       = useStore(s => s.teachers);
-  const payments       = useStore(s => s.payments);
-  const exams          = useStore(s => s.exams);
+  const students       = useStore(s => s.students) || [];
+  const attendanceLogs = useStore(s => s.attendanceLogs) || [];
+  const teachers       = useStore(s => s.teachers) || [];
+  const payments       = useStore(s => s.payments) || [];
+  const exams          = useStore(s => s.exams) || [];
 
   const [query,        setQuery]        = useState("");
   const [hasSearched,  setHasSearched]  = useState(false);

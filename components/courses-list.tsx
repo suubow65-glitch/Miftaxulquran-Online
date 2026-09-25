@@ -42,7 +42,7 @@ const defaultConfig = {
 };
 
 export function CoursesList({ filterCategory = "all" }: { filterCategory?: string }) {
-  const storeCourses = useStore((state) => state.courses);
+  const storeCourses = useStore((state) => state.courses) || [];
   const courseHelpCTA = useStore((state) => state.courseHelpCTA);
   const [isClient, setIsClient] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<StoreCourse | null>(null);
