@@ -1127,11 +1127,11 @@ export const useStore = create<CMSState>()(
       initializeSupabase: async () => {
         try {
           const [
-            { data: students },
-            { data: teachers },
-            { data: attendances },
-            { data: payments },
-            { data: exams },
+            { data: students, error: studentsErr },
+            { data: teachers, error: teachersErr },
+            { data: attendances, error: attendancesErr },
+            { data: payments, error: paymentsErr },
+            { data: exams, error: examsErr },
           ] = await Promise.all([
             supabase.from('students').select('*'),
             supabase.from('teachers').select('*'),
@@ -1140,11 +1140,17 @@ export const useStore = create<CMSState>()(
             supabase.from('exams').select('*'),
           ]);
 
-          if (students) set({ students: students as any });
-          if (teachers) set({ teachers: teachers as any });
-          if (attendances) set({ attendanceLogs: attendances as any });
-          if (payments) set({ payments: payments as any });
-          if (exams) set({ exams: exams as any });
+          if (studentsErr) console.error("Error fetching students:", studentsErr);
+          if (teachersErr) console.error("Error fetching teachers:", teachersErr);
+          if (attendancesErr) console.error("Error fetching attendances:", attendancesErr);
+          if (paymentsErr) console.error("Error fetching payments:", paymentsErr);
+          if (examsErr) console.error("Error fetching exams:", examsErr);
+
+          if (students && students.length > 0) set({ students: students as any });
+          if (teachers && teachers.length > 0) set({ teachers: teachers as any });
+          if (attendances && attendances.length > 0) set({ attendanceLogs: attendances as any });
+          if (payments && payments.length > 0) set({ payments: payments as any });
+          if (exams && exams.length > 0) set({ exams: exams as any });
         } catch (error) {
           console.error("Failed to fetch Supabase data:", error);
         }
