@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap");
+
+/* ============================================================
+   MIFTAXUL QURAN — OFFICIAL BRAND COLORS
+   Extracted from the real Miftaxul Quran logo image:
+   - Bright Emerald Green (mosque dome + text): #27AE60
+   - Brand Green (main):                        #1A8049
+   - Deep Green (dark tones):                   #0D5C2E
+   - Gold Sunburst (CTA / accents):             #F0AE20
+   - Gold Highlight:                            #F5C84A
+   - Gold Dark (hover):                         #D4920F
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --background: #f8fdf9;
+  --foreground: #0B2B18;
+
+  /* PRIMARY BRAND GREENS — extracted from logo */
+  --primary:       #27AE60;   /* bright emerald (mosque dome + brand text) */
+  --primary-dark:  #0D5C2E;   /* deep dark green */
+  --primary-light: #2ECC71;   /* lighter hover green */
+
+  --primary-50:  #edfbf3;
+  --primary-100: #d0f5e2;
+  --primary-200: #a1eac5;
+  --primary-300: #63d99f;
+  --primary-400: #2ECC71;
+  --primary-500: #27AE60;    /* logo bright green */
+  --primary-600: #1A8049;    /* logo mid green */
+  --primary-700: #156634;
+  --primary-800: #0D5C2E;    /* logo deep green */
+  --primary-900: #083D1F;
+  --primary-950: #042211;
+
+  /* GOLD ACCENTS — extracted from logo sunburst rays */
+  --gold-50:  #fefceb;
+  --gold-100: #fef5c3;
+  --gold-200: #fde980;
+  --gold-300: #fbd83e;
+  --gold-400: #F5C84A;       /* gold highlight */
+  --gold-500: #F0AE20;       /* primary logo gold */
+  --gold-600: #D4920F;       /* gold hover/dark */
+  --gold-700: #A97010;
+  --gold-800: #7A500D;
+  --gold-900: #4C3208;
+}
+
+@theme {
+  --color-background:    var(--background);
+  --color-foreground:    var(--foreground);
+  --color-primary:       var(--primary);
+  --color-primary-dark:  var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-primary-50:    var(--primary-50);
+  --color-primary-100:   var(--primary-100);
+  --color-primary-200:   var(--primary-200);
+  --color-primary-300:   var(--primary-300);
+  --color-primary-400:   var(--primary-400);
+  --color-primary-500:   var(--primary-500);
+  --color-primary-600:   var(--primary-600);
+  --color-primary-700:   var(--primary-700);
+  --color-primary-800:   var(--primary-800);
+  --color-primary-900:   var(--primary-900);
+  --color-primary-950:   var(--primary-950);
+  --color-gold-50:       var(--gold-50);
+  --color-gold-100:      var(--gold-100);
+  --color-gold-200:      var(--gold-200);
+  --color-gold-300:      var(--gold-300);
+  --color-gold-400:      var(--gold-400);
+  --color-gold-500:      var(--gold-500);
+  --color-gold-600:      var(--gold-600);
+  --color-gold-700:      var(--gold-700);
+  --color-gold-800:      var(--gold-800);
+  --color-gold-900:      var(--gold-900);
+  --font-sans: "Inter", Arial, Helvetica, sans-serif;
+}
+
+/* Base Styles */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html { scroll-behavior: smooth; }
+
+@layer utilities {
+  /* Hero / Section gradients — exact logo greens */
+  .gradient-primary {
+    background: linear-gradient(135deg, #27AE60 0%, #1A8049 50%, #0D5C2E 100%);
+  }
+  .gradient-hero {
+    background: linear-gradient(150deg, #1A8049 0%, #156634 40%, #0D5C2E 70%, #083D1F 100%);
+  }
+
+  /* Gold CTA gradient — exact logo sunburst gold */
+  .gradient-gold {
+    background: linear-gradient(135deg, #F5C84A 0%, #F0AE20 55%, #D4920F 100%);
+  }
+
+  /* Gold text effect */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #F5C84A 0%, #F0AE20 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Shadows */
+  .shadow-gold {
+    box-shadow: 0 10px 40px -10px rgba(240, 174, 32, 0.45);
+  }
+
+  /* Logo ring glow — gold from logo */
+  .logo-glow {
+    box-shadow: 0 0 0 2px rgba(240, 174, 32, 0.5), 0 4px 24px rgba(240, 174, 32, 0.25);
+  }
+
+  /* Arabic font */
+  .font-arabic { font-family: "Amiri", serif; }
+}
