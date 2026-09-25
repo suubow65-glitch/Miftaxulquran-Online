@@ -1125,25 +1125,29 @@ export const useStore = create<CMSState>()(
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
       initializeSupabase: async () => {
-        const [
-          { data: students },
-          { data: teachers },
-          { data: attendances },
-          { data: payments },
-          { data: exams },
-        ] = await Promise.all([
-          supabase.from('students').select('*'),
-          supabase.from('teachers').select('*'),
-          supabase.from('attendance_logs').select('*'),
-          supabase.from('payments').select('*'),
-          supabase.from('exams').select('*'),
-        ]);
+        try {
+          const [
+            { data: students },
+            { data: teachers },
+            { data: attendances },
+            { data: payments },
+            { data: exams },
+          ] = await Promise.all([
+            supabase.from('students').select('*').catch(() => ({ data: null })),
+            supabase.from('teachers').select('*').catch(() => ({ data: null })),
+            supabase.from('attendance_logs').select('*').catch(() => ({ data: null })),
+            supabase.from('payments').select('*').catch(() => ({ data: null })),
+            supabase.from('exams').select('*').catch(() => ({ data: null })),
+          ]);
 
-        if (students) set({ students: students as any });
-        if (teachers) set({ teachers: teachers as any });
-        if (attendances) set({ attendanceLogs: attendances as any });
-        if (payments) set({ payments: payments as any });
-        if (exams) set({ exams: exams as any });
+          if (students) set({ students: students as any });
+          if (teachers) set({ teachers: teachers as any });
+          if (attendances) set({ attendanceLogs: attendances as any });
+          if (payments) set({ payments: payments as any });
+          if (exams) set({ exams: exams as any });
+        } catch (error) {
+          console.error("Failed to fetch Supabase data:", error);
+        }
       },
 
       addStudent: async (student) => {
