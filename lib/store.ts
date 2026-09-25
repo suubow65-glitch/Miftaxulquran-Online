@@ -1133,11 +1133,11 @@ export const useStore = create<CMSState>()(
             { data: payments },
             { data: exams },
           ] = await Promise.all([
-            supabase.from('students').select('*').catch(() => ({ data: null })),
-            supabase.from('teachers').select('*').catch(() => ({ data: null })),
-            supabase.from('attendance_logs').select('*').catch(() => ({ data: null })),
-            supabase.from('payments').select('*').catch(() => ({ data: null })),
-            supabase.from('exams').select('*').catch(() => ({ data: null })),
+            supabase.from('students').select('*'),
+            supabase.from('teachers').select('*'),
+            supabase.from('attendance_logs').select('*'),
+            supabase.from('payments').select('*'),
+            supabase.from('exams').select('*'),
           ]);
 
           if (students) set({ students: students as any });
