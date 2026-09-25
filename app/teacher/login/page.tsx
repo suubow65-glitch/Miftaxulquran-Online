@@ -6,6 +6,7 @@ import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, User, ArrowRight, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function TeacherLogin() {
   const router = useRouter();
@@ -25,21 +26,28 @@ export default function TeacherLogin() {
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      const teacher = teachers.find(t => t.username === username && t.password === password);
-      if (teacher) {
-        localStorage.setItem("teacher_session", teacher.id);
-        router.push("/teacher/dashboard");
-      } else {
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password,
+      });
+
+      if (signInError || !data.session) {
         setError(t("Magaca ama sirta waa khalad.", "Invalid username or password."));
-        setLoading(false);
+      } else {
+        localStorage.setItem("teacher_session", data.session.user.id);
+        router.push("/teacher/dashboard");
       }
-    }, 1000);
+    } catch (err) {
+      setError(t("Cilad ayaa dhacday.", "An error occurred."));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

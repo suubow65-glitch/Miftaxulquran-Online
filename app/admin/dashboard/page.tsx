@@ -352,6 +352,12 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
+  const initializeSupabase = useStore((s) => s.initializeSupabase);
+
+  useEffect(() => {
+    initializeSupabase();
+  }, [initializeSupabase]);
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");

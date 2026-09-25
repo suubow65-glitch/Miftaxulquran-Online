@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from './supabase';
 
 export type Category = "quran" | "tajweed" | "arabic" | "islamic" | "seerah" | "all";
 
@@ -538,6 +539,7 @@ interface CMSState {
   addExam: (exam: Exam) => void;
   updateExam: (id: string, exam: Exam) => void;
   deleteExam: (id: string) => void;
+  initializeSupabase: () => Promise<void>;
 }
 
 const initialHeroSlides: HeroSlide[] = [
@@ -1122,21 +1124,79 @@ export const useStore = create<CMSState>()(
       })),
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
-      addStudent: (student) => set(state => ({ students: [...state.students, student] })),
-      updateStudent: (id, student) => set(state => ({ students: state.students.map(s => s.id === id ? student : s) })),
-      deleteStudent: (id) => set(state => ({ students: state.students.filter(s => s.id !== id) })),
+      initializeSupabase: async () => {
+        const [
+          { data: students },
+          { data: teachers },
+          { data: attendances },
+          { data: payments },
+          { data: exams },
+        ] = await Promise.all([
+          supabase.from('students').select('*'),
+          supabase.from('teachers').select('*'),
+          supabase.from('attendance_logs').select('*'),
+          supabase.from('payments').select('*'),
+          supabase.from('exams').select('*'),
+        ]);
 
-      addAttendanceLog: (log) => set(state => ({ attendanceLogs: [...state.attendanceLogs, log] })),
-      updateAttendanceLog: (id, log) => set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) })),
-      deleteAttendanceLog: (id) => set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) })),
+        if (students) set({ students: students as any });
+        if (teachers) set({ teachers: teachers as any });
+        if (attendances) set({ attendanceLogs: attendances as any });
+        if (payments) set({ payments: payments as any });
+        if (exams) set({ exams: exams as any });
+      },
 
-      addPayment: (payment) => set(state => ({ payments: [payment, ...state.payments] })),
-      updatePayment: (id, payment) => set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) })),
-      deletePayment: (id) => set(state => ({ payments: state.payments.filter(p => p.id !== id) })),
+      addStudent: async (student) => {
+        set(state => ({ students: [...state.students, student] }));
+        await supabase.from('students').insert(student);
+      },
+      updateStudent: async (id, student) => {
+        set(state => ({ students: state.students.map(s => s.id === id ? student : s) }));
+        await supabase.from('students').update(student).eq('id', id);
+      },
+      deleteStudent: async (id) => {
+        set(state => ({ students: state.students.filter(s => s.id !== id) }));
+        await supabase.from('students').delete().eq('id', id);
+      },
 
-      addExam: (exam) => set(state => ({ exams: [exam, ...state.exams] })),
-      updateExam: (id, exam) => set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) })),
-      deleteExam: (id) => set(state => ({ exams: state.exams.filter(e => e.id !== id) })),
+      addAttendanceLog: async (log) => {
+        set(state => ({ attendanceLogs: [...state.attendanceLogs, log] }));
+        await supabase.from('attendance_logs').insert(log);
+      },
+      updateAttendanceLog: async (id, log) => {
+        set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) }));
+        await supabase.from('attendance_logs').update(log).eq('id', id);
+      },
+      deleteAttendanceLog: async (id) => {
+        set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) }));
+        await supabase.from('attendance_logs').delete().eq('id', id);
+      },
+
+      addPayment: async (payment) => {
+        set(state => ({ payments: [payment, ...state.payments] }));
+        await supabase.from('payments').insert(payment);
+      },
+      updatePayment: async (id, payment) => {
+        set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) }));
+        await supabase.from('payments').update(payment).eq('id', id);
+      },
+      deletePayment: async (id) => {
+        set(state => ({ payments: state.payments.filter(p => p.id !== id) }));
+        await supabase.from('payments').delete().eq('id', id);
+      },
+
+      addExam: async (exam) => {
+        set(state => ({ exams: [exam, ...state.exams] }));
+        await supabase.from('exams').insert(exam);
+      },
+      updateExam: async (id, exam) => {
+        set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) }));
+        await supabase.from('exams').update(exam).eq('id', id);
+      },
+      deleteExam: async (id) => {
+        set(state => ({ exams: state.exams.filter(e => e.id !== id) }));
+        await supabase.from('exams').delete().eq('id', id);
+      },
     }),
     {
       name: 'miftaxul-cms-storage',
