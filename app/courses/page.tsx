@@ -48,7 +48,7 @@ export default function CoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 justify-center mb-12">
-            {tabs.map((tab) => (
+            {tabs?.map((tab) => (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                 className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab.key ? "text-primary-950 shadow-lg" : "bg-white text-gray-600 border border-gray-200 hover:border-primary/40"}`}
                 style={activeTab === tab.key ? { background: "linear-gradient(135deg,#F5C84A,#F0AE20)", boxShadow: "0 4px 14px rgba(240,174,32,0.4)" } : {}}>

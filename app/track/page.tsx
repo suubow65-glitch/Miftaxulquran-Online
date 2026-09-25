@@ -27,6 +27,8 @@ function isQuranType(name: string) {
 type HeatStatus = "attended" | "absent" | "leave" | "none";
 
 export default function TrackPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const students       = useStore(s => s.students);
   const attendanceLogs = useStore(s => s.attendanceLogs);
   const teachers       = useStore(s => s.teachers);
@@ -37,6 +39,8 @@ export default function TrackPage() {
   const [hasSearched,  setHasSearched]  = useState(false);
   const [student,      setStudent]      = useState<any>(null);
   const [activeSubject, setActiveSubject] = useState<string>("");
+
+  if (!mounted) return null;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +186,7 @@ export default function TrackPage() {
               {/* Subject Tabs */}
               {student.enrollments?.length > 0 ? (
                 <div className="flex overflow-x-auto gap-2 pb-1 justify-center">
-                  {student.enrollments.map((enr: any) => {
+                  {student.enrollments?.map((enr: any) => {
                     const lbl = subjectLabel(enr.subjectName);
                     const isActive = activeSubject === enr.subjectName;
                     return (
@@ -358,7 +362,7 @@ export default function TrackPage() {
                             </motion.div>
                           </div>
                           <div className="flex justify-between mt-2">
-                            {[0, 10, 20, 30].map(n => (
+                            {[0, 10, 20, 30]?.map(n => (
                               <span key={n} className="text-[10px] text-gray-400 font-bold">{n}</span>
                             ))}
                           </div>
@@ -380,7 +384,7 @@ export default function TrackPage() {
                           </div>
                         </div>
                         <div className="grid grid-cols-10 gap-1.5">
-                          {heatmapDays.map((day, i) => (
+                          {heatmapDays?.map((day, i) => (
                             <div
                               key={i}
                               title={`${day.date.toLocaleDateString()} — ${day.status}`}
@@ -404,7 +408,7 @@ export default function TrackPage() {
                           Exam Results / Natiijada Imtixaanka
                         </h3>
                         <div className="grid gap-3 sm:grid-cols-2">
-                          {studentExams.map(exam => (
+                          {studentExams?.map(exam => (
                             <div key={exam.id} className="bg-gray-50 border border-gray-100 p-4 rounded-xl shadow-sm flex justify-between items-center">
                               <div>
                                 <p className="text-sm font-bold text-gray-900">{exam.subject}</p>
@@ -432,7 +436,7 @@ export default function TrackPage() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {recentLogs.map((log, i) => (
+                          {recentLogs?.map((log, i) => (
                             <div key={log.id}
                               className="group flex items-stretch bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-gold-200 transition-all"
                             >

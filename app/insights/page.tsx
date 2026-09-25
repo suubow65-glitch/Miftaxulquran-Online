@@ -4,11 +4,16 @@ import { useStore } from "@/lib/store";
 import { ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
 export default function InsightsPage() {
   const { lang, t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const insights = useStore((state) => state.insights) || [];
   const insightsHeader = useStore((state) => state.insightsHeader);
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -47,7 +52,7 @@ export default function InsightsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {insights.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {insights.map((post, i) => (
+              {insights?.map((post, i) => (
                 <motion.div 
                   key={post.id} 
                   initial={{ opacity: 0, y: 20 }}

@@ -63,7 +63,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Contact Cards */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
-            {contactCards.map(({ icon: Icon, label, value, href, color }) => (
+            {contactCards?.map(({ icon: Icon, label, value, href, color }) => (
               <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer"
                 className="group rounded-2xl border border-primary-100 bg-white p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div className="h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg"
@@ -181,7 +181,7 @@ export default function ContactPage() {
                     { d: t("Isniinta – Khamiista", "Mon – Thu"), h: "08:00 – 22:00" },
                     { d: t("Jimcaha", "Friday"), h: "Jumʿah – 14:00 – 22:00" },
                     { d: t("Sabtida – Axadda", "Sat – Sun"), h: "09:00 – 20:00" },
-                  ].map(({ d, h }) => (
+                  ]?.map(({ d, h }) => (
                     <div key={d} className="flex justify-between gap-4">
                       <span className="font-medium text-gray-700">{d}</span>
                       <span className="text-gray-500 font-medium">{h}</span>

@@ -105,7 +105,7 @@ export default function LibraryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Category filter */}
           <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {catTabs.map((tab) => (
+            {catTabs?.map((tab) => (
               <button key={tab.key} onClick={() => setCategory(tab.key)}
                 className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${category === tab.key ? "text-primary-950 shadow-lg" : "bg-white text-gray-600 border border-gray-200 hover:border-primary/40"}`}
                 style={category === tab.key ? { background: "linear-gradient(135deg,#F5C84A,#F0AE20)", boxShadow: "0 4px 14px rgba(240,174,32,0.4)" } : {}}>
@@ -127,7 +127,7 @@ export default function LibraryPage() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((book) => (
+              {filtered?.map((book) => (
                 <div key={book.id} className="group rounded-2xl border border-primary-100 bg-white p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                   {/* Book visual */}
                   <div className="h-36 rounded-xl flex items-center justify-center text-6xl mb-5 flex-shrink-0"

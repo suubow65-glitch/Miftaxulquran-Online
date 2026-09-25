@@ -67,7 +67,7 @@ function StudentCard({
   onSelectSubject: (studentId: string, subject: string) => void;
 }) {
   const mySubjects = student.enrollments?.filter(e => e.teacherId === teacherId) ?? [];
-  const initials = student.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+  const initials = student.name.split(" ")?.map(n => n[0]).join("").substring(0, 2).toUpperCase();
   const grad = avatarGradient(student.id);
 
   return (
@@ -108,7 +108,7 @@ function StudentCard({
             {mySubjects.length === 0 ? (
               <p className="text-sm text-gray-400 italic">No subjects assigned</p>
             ) : (
-              mySubjects.map(enr => {
+              mySubjects?.map(enr => {
                 const cfg = subjectCfg(enr.subjectName);
                 return (
                   <button
@@ -247,7 +247,7 @@ export default function TeacherDashboard() {
       parentNote:  form.parentNote,
     });
 
-    const updatedEnrollments = activeStudent.enrollments.map((enr: Enrollment) => {
+    const updatedEnrollments = activeStudent.enrollments?.map((enr: Enrollment) => {
       if (enr.subjectName !== selectedSubject) return enr;
       if (isQuran && form.surahEnded && form.ayahEnded) {
         return { ...enr, currentJuz: form.juz || enr.currentJuz, currentHizb: form.hizb || enr.currentHizb, currentSurah: form.surahEnded, currentAyah: form.ayahEnded };
@@ -329,7 +329,7 @@ export default function TeacherDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myStudents.map(student => (
+            {myStudents?.map(student => (
               <StudentCard
                 key={student.id}
                 student={student}
@@ -403,7 +403,7 @@ export default function TeacherDashboard() {
                         Attendance Status / Xaaladda Soo-xaadirka
                       </legend>
                       <div className="grid grid-cols-2 gap-2.5">
-                        {ATTENDANCE_STATUSES.map(st => (
+                        {ATTENDANCE_STATUSES?.map(st => (
                           <label key={st} className={`flex items-center justify-center text-center py-3 px-3 rounded-2xl border-2 cursor-pointer transition-all font-bold text-xs leading-tight ${
                             form.status === st ? STATUS_STYLE[st] : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
                           }`}>
@@ -430,7 +430,7 @@ export default function TeacherDashboard() {
                                 {[
                                   { label: "Juz / Juska", field: "juz", placeholder: "e.g. 30" },
                                   { label: "Hizb / Xisbiga", field: "hizb", placeholder: "e.g. 60" },
-                                ].map(({ label, field, placeholder }) => (
+                                ]?.map(({ label, field, placeholder }) => (
                                   <div key={field}>
                                     <label className="block text-xs font-bold text-gray-600 mb-1.5">{label}</label>
                                     <input value={(form as any)[field]} onChange={e => setForm({ ...form, [field]: e.target.value })}
@@ -444,7 +444,7 @@ export default function TeacherDashboard() {
                                   { label: "Ayah Started / Aayadda Bilawga",     field: "ayahStarted",  ph: "e.g. 1" },
                                   { label: "Surah Ended / Suuradda Dhammaadka", field: "surahEnded",   ph: "e.g. Al-Baqarah" },
                                   { label: "Ayah Ended / Aayadda Dhammaadka",   field: "ayahEnded",    ph: "e.g. 5" },
-                                ].map(({ label, field, ph }) => (
+                                ]?.map(({ label, field, ph }) => (
                                   <div key={field}>
                                     <label className="block text-xs font-bold text-gray-600 mb-1.5">{label}</label>
                                     <input required value={(form as any)[field]} onChange={e => setForm({ ...form, [field]: e.target.value })}
@@ -469,7 +469,7 @@ export default function TeacherDashboard() {
                                   { label: "Page Started / Bogga Bilawga",        field: "pageStarted",   ph: "e.g. 12" },
                                   { label: "Lesson Ended / Casharka Dhammaadka", field: "lessonEnded",   ph: "e.g. Lesson 2" },
                                   { label: "Page Ended / Bogga Dhammaadka",       field: "pageEnded",     ph: "e.g. 15" },
-                                ].map(({ label, field, ph }) => (
+                                ]?.map(({ label, field, ph }) => (
                                   <div key={field}>
                                     <label className="block text-xs font-bold text-gray-600 mb-1.5">{label}</label>
                                     <input required value={(form as any)[field]} onChange={e => setForm({ ...form, [field]: e.target.value })}

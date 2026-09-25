@@ -182,7 +182,7 @@ function PaymentsModule() {
             {students.length === 0 && (
               <tr><td colSpan={4} className="p-8 text-center text-gray-500 font-medium">No students found.</td></tr>
             )}
-            {students.map(std => {
+            {students?.map(std => {
               const payment = payments.find(p => p.studentId === std.id && p.month === currentMonth);
               const isPaid = payment?.status === "Paid";
               const enrolledSubjects = std.enrollments?.map(e => e.subjectName).join(', ') || "-";
@@ -262,7 +262,7 @@ function ExamsModule() {
               <label className="block text-xs font-bold text-gray-700 mb-1">Student / Ardayga</label>
               <select value={form.studentId} onChange={e => setForm({...form, studentId: e.target.value})} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27AE60]/50 outline-none bg-white text-sm">
                 <option value="">-- Select Student --</option>
-                {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.studentId})</option>)}
+                {students?.map(s => <option key={s.id} value={s.id}>{s.name} ({s.studentId})</option>)}
               </select>
             </div>
             <div>
@@ -322,7 +322,7 @@ function ExamsModule() {
             {exams.length === 0 && (
               <tr><td colSpan={6} className="p-8 text-center text-gray-500 font-medium">No exams recorded yet.</td></tr>
             )}
-            {[...exams].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(exam => {
+            {[...exams].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())?.map(exam => {
               const student = students.find(s => s.id === exam.studentId);
               return (
                 <tr key={exam.id} className="hover:bg-gray-50/50 transition-colors">
@@ -386,12 +386,12 @@ export default function AdminDashboard() {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4">
-          {["GENERAL", "ACADEMIC", "WEBSITE CONTENT", "SYSTEM"].map(group => (
+          {["GENERAL", "ACADEMIC", "WEBSITE CONTENT", "SYSTEM"]?.map(group => (
             <div key={group} className="space-y-1">
               {group !== "GENERAL" && (
                 <div className="px-4 py-1 text-[10px] font-bold text-white/50 tracking-widest">{group}</div>
               )}
-              {navItems.filter(i => i.group === group).map(({ id, label, icon: Icon }) => (
+              {navItems.filter(i => i.group === group)?.map(({ id, label, icon: Icon }) => (
                 <button key={id} onClick={() => { setModule(id); setSidebarOpen(false); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${module === id ? "text-primary-950 shadow-lg" : "text-primary-200/80 hover:bg-white/10 hover:text-white"}`}
                   style={module === id ? { background: "linear-gradient(135deg,#F5C84A,#F0AE20)" } : {}}>
@@ -525,7 +525,7 @@ function WhyUsModule() {
       <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
         <h2 className="font-extrabold text-gray-900 mb-6">Edit Features (8 Cards)</h2>
         <div className="space-y-6">
-          {form.features.map((feature, i) => (
+          {form.features?.map((feature, i) => (
             <div key={feature.id} className="p-5 border border-gray-100 rounded-xl bg-gray-50/50 flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 bg-primary-100 text-primary flex items-center justify-center rounded-lg font-bold">#{i + 1}</div>
@@ -677,7 +677,7 @@ function OverviewModule() {
   return (
     <div className="space-y-8">
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {cards.map(({ icon: Icon, label, value, color, sub }) => (
+        {cards?.map(({ icon: Icon, label, value, color, sub }) => (
           <div key={label} className="rounded-2xl border border-gray-200 bg-white p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="h-11 w-11 rounded-xl flex items-center justify-center shadow-sm"
@@ -700,7 +700,7 @@ function OverviewModule() {
             { label: "Add New Course", icon: Plus, mod: "courses" as Module },
             { label: "Upload PDF Book", icon: FileText, mod: "library" as Module },
             { label: "View Messages", icon: MessageSquare, mod: "messages" as Module },
-          ].map(({ label, icon: Icon, mod }) => (
+          ]?.map(({ label, icon: Icon, mod }) => (
             <button key={label} className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-primary hover:text-primary hover:bg-primary-50 transition-all text-left">
               <Icon className="h-4 w-4 text-primary" /> {label}
             </button>
@@ -970,7 +970,7 @@ function HeroSlideshowModule() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {heroSlides.map((slide, idx) => (
+          {heroSlides?.map((slide, idx) => (
             <div key={slide.id} className="group relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-lg transition-all">
               {/* Image Preview */}
               <div className="relative aspect-[4/3] bg-gray-100">
@@ -1133,7 +1133,7 @@ function StepsModule() {
       <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
         <h2 className="font-extrabold text-gray-900 mb-6">Edit Steps (3 Items)</h2>
         <div className="space-y-6">
-          {form.steps.map((step, i) => (
+          {form.steps?.map((step, i) => (
             <div key={step.id} className="p-5 border border-gray-100 rounded-xl bg-gray-50/50 flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 bg-primary-100 text-primary flex items-center justify-center rounded-lg font-bold">#{i + 1}</div>
@@ -1216,7 +1216,7 @@ function StatsModule() {
       <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
         <h2 className="font-extrabold text-gray-900 mb-6">Edit Stats (6 Cards)</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {form.stats.map((stat, i) => (
+          {form.stats?.map((stat, i) => (
             <div key={stat.id} className="p-5 border border-gray-100 rounded-xl bg-gray-50/50 flex flex-col gap-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="h-6 w-6 bg-primary-100 text-primary flex items-center justify-center rounded text-xs font-bold">#{i + 1}</span>
@@ -1362,7 +1362,7 @@ function CoursesModule() {
                   <select value={editing.category}
                     onChange={e => setEditing(v => v ? { ...v, category: e.target.value as StoreCourse["category"] } : v)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm">
-                    {["quran","tajweed","arabic","islamic","seerah"].map(o => <option key={o} value={o}>{o.toUpperCase()}</option>)}
+                    {["quran","tajweed","arabic","islamic","seerah"]?.map(o => <option key={o} value={o}>{o.toUpperCase()}</option>)}
                   </select>
                 </div>
                 {field("Icon (Lucide)", "icon", "e.g. BookOpen")}
@@ -1468,7 +1468,7 @@ function CoursesModule() {
               </div>
               
               <div className="space-y-4">
-                {(editing.learningPaths || []).map((lp, idx) => (
+                {(editing.learningPaths || [])?.map((lp, idx) => (
                   <div key={lp.id} className="p-5 rounded-2xl border border-gray-200 bg-white shadow-sm relative group">
                     <div className="absolute top-4 right-4 flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                       <button 
@@ -1555,7 +1555,7 @@ function CoursesModule() {
       )}
 
       <div className="space-y-3">
-        {courses.map((c) => (
+        {courses?.map((c) => (
           <div key={c.id} className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 hover:shadow-sm transition-shadow">
             <div className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
               style={{ background: "linear-gradient(135deg,#27AE60,#0D5C2E)" }}>
@@ -1645,7 +1645,7 @@ function LibraryModule() {
               <label className="block text-xs font-bold text-gray-700 mb-1.5">Category</label>
               <select value={editing.category} onChange={e => setEditing(v => v ? { ...v, category: e.target.value as StoreBook["category"] } : v)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
-                {["quran","tajweed","arabic","islamic","seerah"].map(o => <option key={o} value={o}>{o}</option>)}
+                {["quran","tajweed","arabic","islamic","seerah"]?.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
             <div>
@@ -1693,7 +1693,7 @@ function LibraryModule() {
       )}
 
       <div className="space-y-3">
-        {books.map((b) => (
+        {books?.map((b) => (
           <div key={b.id} className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5">
             <div className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xl bg-gold-50 border border-gold-200">{b.emoji}</div>
             <div className="flex-1 min-w-0">
@@ -1805,7 +1805,7 @@ function TestimonialsModule() {
       )}
 
       <div className="space-y-4">
-        {(tab === "pending" ? pendingItems : liveItems).map(item => (
+        {(tab === "pending" ? pendingItems : liveItems)?.map(item => (
           <div key={item.id} className="rounded-2xl border border-gray-200 bg-white p-5 flex items-start gap-4 hover:shadow-md transition-all">
             {item.image ? (
               <img src={item.image} alt={item.name} className="h-12 w-12 rounded-full object-cover border border-gray-200 flex-shrink-0" />
@@ -1820,7 +1820,7 @@ function TestimonialsModule() {
                   <p className="font-bold text-gray-900">{item.name}</p>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">{item.location || (item as any).country}</span>
                   <div className="flex gap-0.5 ml-1">
-                    {[...Array(item.rating)].map((_, i) => <Star key={i} className="h-3 w-3 fill-gold-400 text-gold-400" />)}
+                    {[...Array(item.rating)]?.map((_, i) => <Star key={i} className="h-3 w-3 fill-gold-400 text-gold-400" />)}
                   </div>
                 </div>
                 <span className="text-xs text-gray-400 font-medium">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Old'}</span>
@@ -1883,7 +1883,7 @@ function FaqModule() {
     if (editingId) {
       updateFaqContent({
         ...faqContent,
-        faqs: faqContent.faqs.map(f => f.id === editingId ? { ...form, id: editingId } : f)
+        faqs: faqContent.faqs?.map(f => f.id === editingId ? { ...form, id: editingId } : f)
       });
     } else {
       updateFaqContent({
@@ -2001,7 +2001,7 @@ function FaqModule() {
         )}
 
         <div className="space-y-3">
-          {faqContent.faqs.map((f, i) => (
+          {faqContent.faqs?.map((f, i) => (
             <div key={f.id} className="rounded-2xl border border-gray-200 bg-white p-5 flex items-start gap-4">
               <div className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
                 style={{ background: "linear-gradient(135deg,#27AE60,#0D5C2E)" }}>{i + 1}</div>
@@ -2036,7 +2036,7 @@ function MessagesModule() {
         const db = getFirebaseDb();
         const q = query(collection(db, "contacts"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() } as Message)));
+        setMessages(snap.docs?.map(d => ({ id: d.id, ...d.data() } as Message)));
       } catch { setMessages([]); } finally { setLoading(false); }
     };
     load();
@@ -2052,7 +2052,7 @@ function MessagesModule() {
       ) : (
         <div className="grid lg:grid-cols-2 gap-4">
           <div className="space-y-3">
-            {messages.map((m) => (
+            {messages?.map((m) => (
               <button key={m.id} onClick={() => setSelected(m)}
                 className={`w-full text-left rounded-2xl border p-5 transition-all hover:shadow-md ${selected?.id === m.id ? "border-primary bg-primary-50/50" : "border-gray-200 bg-white"}`}>
                 <div className="flex items-center justify-between gap-2 mb-1">
@@ -2130,7 +2130,7 @@ function SettingsModule() {
         <h2 className="font-extrabold text-gray-900 mb-1">Site Settings</h2>
         <p className="text-xs text-gray-400 mb-6">These values appear in the site footer, contact section, and WhatsApp button.</p>
         <div className="space-y-5">
-          {fields.map(({ key, label, placeholder, isTextarea }) => (
+          {fields?.map(({ key, label, placeholder, isTextarea }) => (
             <div key={key}>
               <label className="block text-xs font-bold text-gray-700 mb-2">{label}</label>
               {isTextarea ? (
@@ -2210,7 +2210,7 @@ function LeadsModule() {
                 <tr>
                   <td colSpan={4} className="p-8 text-center text-gray-400">No leads yet.</td>
                 </tr>
-              ) : leads.map(l => (
+              ) : leads?.map(l => (
                 <tr key={l.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="p-4">
                     <p className="font-bold text-gray-900">{l.name} <span className="text-gray-400 font-normal text-xs">(Age: {l.age})</span></p>
@@ -2395,7 +2395,7 @@ function TeachersModule() {
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {(!teachers ? [] : teachers).map(t => (
+        {(!teachers ? [] : teachers)?.map(t => (
           <div key={t.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow relative group">
             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
               <button onClick={() => { setEditingId(t.id); setForm(t); }} className="p-2 bg-white text-gray-600 hover:text-primary rounded-lg border border-gray-200 shadow-sm"><Pencil className="h-4 w-4" /></button>
@@ -2571,7 +2571,7 @@ function InsightsModule() {
       )}
 
       <div className="space-y-3">
-        {insights.map(p => (
+        {insights?.map(p => (
           <div key={p.id} className="rounded-2xl border border-gray-200 bg-white p-5 flex items-start gap-4">
             {p.image && (
               <div className="h-16 w-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
@@ -2707,7 +2707,7 @@ function QuranPlayerModule() {
       )}
 
       <div className="space-y-3">
-        {tracks.map(t => (
+        {tracks?.map(t => (
           <div key={t.id} className={`rounded-2xl border ${t.isActive ? 'border-primary bg-primary-50/30' : 'border-gray-200 bg-white'} p-5 flex items-center gap-4`}>
             <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${t.isActive ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
               <Music className="h-5 w-5" />
@@ -2751,7 +2751,7 @@ function ChallengesModule() {
   const updateCard = (id: string, updates: Partial<typeof content.cards[0]>) => {
     setForm(f => ({
       ...f,
-      cards: f.cards.map(c => c.id === id ? { ...c, ...updates } : c)
+      cards: f.cards?.map(c => c.id === id ? { ...c, ...updates } : c)
     }));
   };
 
@@ -2808,7 +2808,7 @@ function ChallengesModule() {
         <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-sm">
           <h3 className="font-extrabold text-gray-900 mb-5">Challenges Cards (6)</h3>
           <div className="space-y-4">
-            {form.cards.map((c, i) => (
+            {form.cards?.map((c, i) => (
               <div key={c.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-sm text-gray-700">Card {i + 1}</span>
@@ -3221,7 +3221,7 @@ function AboutModule() {
         <div className="space-y-4 pt-6 border-t border-gray-100">
           <h3 className="text-lg font-bold text-gray-800 bg-gray-50 p-3 rounded-lg">4. Core Values</h3>
           <div className="grid gap-4">
-            {form.values.map((v, idx) => (
+            {form.values?.map((v, idx) => (
               <div key={v.id} className="p-4 border border-gray-100 rounded-xl bg-gray-50/50 flex flex-col gap-3">
                 <div className="flex gap-3">
                   <div className="w-1/3">
@@ -3312,14 +3312,14 @@ function PricingModule() {
   const updatePlan = (id: string, field: string, val: any) => {
     setForm({
       ...form,
-      plans: form.plans.map(p => p.id === id ? { ...p, [field]: val } : p)
+      plans: form.plans?.map(p => p.id === id ? { ...p, [field]: val } : p)
     });
   };
 
   const updatePlanFeature = (planId: string, lang: 'So' | 'En', index: number, val: string) => {
     setForm({
       ...form,
-      plans: form.plans.map(p => {
+      plans: form.plans?.map(p => {
         if (p.id === planId) {
           const field = `features${lang}` as "featuresSo" | "featuresEn";
           const newFeatures = [...p[field]];
@@ -3334,7 +3334,7 @@ function PricingModule() {
   const addPlanFeature = (planId: string, lang: 'So' | 'En') => {
     setForm({
       ...form,
-      plans: form.plans.map(p => {
+      plans: form.plans?.map(p => {
         if (p.id === planId) {
           const field = `features${lang}` as "featuresSo" | "featuresEn";
           return { ...p, [field]: [...p[field], ""] };
@@ -3347,7 +3347,7 @@ function PricingModule() {
   const removePlanFeature = (planId: string, lang: 'So' | 'En', index: number) => {
     setForm({
       ...form,
-      plans: form.plans.map(p => {
+      plans: form.plans?.map(p => {
         if (p.id === planId) {
           const field = `features${lang}` as "featuresSo" | "featuresEn";
           const newFeatures = [...p[field]];
@@ -3412,7 +3412,7 @@ function PricingModule() {
           </div>
           
           <div className="grid gap-6">
-            {form.plans.map((p, idx) => (
+            {form.plans?.map((p, idx) => (
               <div key={p.id} className="p-5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                   <div className="flex items-center gap-3">
@@ -3469,7 +3469,7 @@ function PricingModule() {
                       <button onClick={() => addPlanFeature(p.id, 'So')} className="text-xs text-primary-600 hover:underline">Add Feature</button>
                     </div>
                     <div className="space-y-2">
-                      {p.featuresSo.map((f, fi) => (
+                      {p.featuresSo?.map((f, fi) => (
                         <div key={fi} className="flex gap-2">
                           <input value={f} onChange={e => updatePlanFeature(p.id, 'So', fi, e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm" />
                           <button onClick={() => removePlanFeature(p.id, 'So', fi)} className="text-gray-400 hover:text-red-500"><X className="h-4 w-4" /></button>
@@ -3485,7 +3485,7 @@ function PricingModule() {
                       <button onClick={() => addPlanFeature(p.id, 'En')} className="text-xs text-gray-600 hover:underline">Add Feature</button>
                     </div>
                     <div className="space-y-2">
-                      {p.featuresEn.map((f, fi) => (
+                      {p.featuresEn?.map((f, fi) => (
                         <div key={fi} className="flex gap-2">
                           <input value={f} onChange={e => updatePlanFeature(p.id, 'En', fi, e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm" />
                           <button onClick={() => removePlanFeature(p.id, 'En', fi)} className="text-gray-400 hover:text-red-500"><X className="h-4 w-4" /></button>
@@ -3742,7 +3742,7 @@ function StudentsModule() {
       status: form.status,
       classDays: form.classDays,
       classTime: form.classTime,
-      enrollments: form.enrollments.map(e => ({ ...e, id: "enr-" + Math.random().toString(36).substr(2, 9) }))
+      enrollments: form.enrollments?.map(e => ({ ...e, id: "enr-" + Math.random().toString(36).substr(2, 9) }))
     });
     setForm({ name: "", studentId: "", status: "Active", classDays: "", classTime: "", enrollments: [] });
     setIsAdding(false);
@@ -3822,7 +3822,7 @@ function StudentsModule() {
             
             <div className="space-y-3">
               {form.enrollments.length === 0 && <p className="text-xs text-gray-500 italic">No subjects added. / Maaddo lama ku darin.</p>}
-              {form.enrollments.map((enr, i) => (
+              {form.enrollments?.map((enr, i) => (
                 <div key={i} className="flex flex-wrap sm:flex-nowrap gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 items-start">
                   <div className="flex-1">
                     <select value={enr.subjectName} onChange={e => updateEnrollment(i, 'subjectName', e.target.value)} className="w-full text-sm px-3 py-2 border border-gray-200 rounded-lg bg-white outline-none">
@@ -3835,7 +3835,7 @@ function StudentsModule() {
                   <div className="flex-1">
                     <select value={enr.teacherId} onChange={e => updateEnrollment(i, 'teacherId', e.target.value)} className="w-full text-sm px-3 py-2 border border-gray-200 rounded-lg bg-white outline-none">
                       <option value="">-- Select Teacher --</option>
-                      {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                      {teachers?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                     </select>
                   </div>
                   <div className="flex-1">
@@ -3868,7 +3868,7 @@ function StudentsModule() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {students.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-gray-500 font-medium">No students found. Add one above. / Arday lama helin. Mid ku dar sare.</td></tr>}
-            {students.map(std => {
+            {students?.map(std => {
               const enrolledSubjects = std.enrollments?.map(e => e.subjectName).join(', ') || "-";
               const assignedTeachers = std.enrollments?.map(e => {
                 const t = teachers.find(t => t.id === e.teacherId);
@@ -3929,7 +3929,7 @@ function LessonLogsModule() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {sortedLogs.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-gray-500 font-medium">No lesson logs recorded yet. / Weli wax diiwaan cashar ah lama qorin.</td></tr>}
-            {sortedLogs.map(log => {
+            {sortedLogs?.map(log => {
               const student = students.find(s => s.id === log.studentId);
               const started = log.subject === "Quran" || log.subject === "Qaida" ? (log.surahStarted ? `${log.surahStarted}:${log.ayahStarted}` : "-") : (log.lessonStarted ? `${log.lessonStarted} (Pg ${log.pageStarted})` : "-");
               const ended = log.subject === "Quran" || log.subject === "Qaida" ? (log.surahEnded ? `${log.surahEnded}:${log.ayahEnded}` : "-") : (log.lessonEnded ? `${log.lessonEnded} (Pg ${log.pageEnded})` : "-");

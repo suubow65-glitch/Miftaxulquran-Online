@@ -113,7 +113,7 @@ export default function RegisterPage() {
               { emoji: "✅", so: "3 Cashar oo bilaash", en: "3 free trial classes" },
               { emoji: "🕒", so: "Waqti aad doortid", en: "Your chosen schedule" },
               { emoji: "🌍", so: "Meel kasta dunida", en: "Anywhere in the world" },
-            ].map((s) => (
+            ]?.map((s) => (
               <div key={s.en} className="flex items-center gap-1.5 text-sm font-semibold text-primary-100/90">
                 <span>{s.emoji}</span>
                 <span>{t(s.so, s.en)}</span>
@@ -235,7 +235,7 @@ export default function RegisterPage() {
                       </label>
                       <select required value={form.course} onChange={set("course")} className={inputClass}>
                         <option value="">{t("Dooro koorsaha...", "Select a course...")}</option>
-                        {courseOptions.map((o) => (
+                        {courseOptions?.map((o) => (
                           <option key={o.value} value={o.value}>
                             {lang === "so" ? o.so : o.en}
                           </option>
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                         </label>
                         <select required value={form.level} onChange={set("level")} className={inputClass}>
                           <option value="">{t("Dooro heerka...", "Select level...")}</option>
-                          {levelOptions.map((o) => (
+                          {levelOptions?.map((o) => (
                             <option key={o.value} value={o.value}>
                               {lang === "so" ? o.so : o.en}
                             </option>
@@ -264,7 +264,7 @@ export default function RegisterPage() {
                         </label>
                         <select required value={form.schedule} onChange={set("schedule")} className={inputClass}>
                           <option value="">{t("Dooro waqtiga...", "Select time...")}</option>
-                          {scheduleOptions.map((o) => (
+                          {scheduleOptions?.map((o) => (
                             <option key={o.value} value={o.value}>
                               {lang === "so" ? o.so : o.en}
                             </option>
@@ -405,7 +405,7 @@ export default function RegisterPage() {
                       { d: t("Isniinta – Khamiista", "Mon – Thu"), h: "08:00 – 22:00" },
                       { d: t("Jimcaha", "Friday"), h: "14:00 – 22:00" },
                       { d: t("Sabtida – Axadda", "Sat – Sun"), h: "09:00 – 20:00" },
-                    ].map(({ d, h }) => (
+                    ]?.map(({ d, h }) => (
                       <div key={d} className="flex justify-between">
                         <span className="font-semibold text-gray-700">{d}</span>
                         <span className="text-gray-500 font-medium">{h}</span>
@@ -426,7 +426,7 @@ export default function RegisterPage() {
                     { icon: ScrollText,  label: t("Tajwiid", "Tajweed"),         color: "#F0AE20" },
                     { icon: Languages,   label: t("Carabiga", "Arabic"),          color: "#1A8049" },
                     { icon: BookMarked,  label: t("Diinta", "Islamic Studies"),  color: "#D4920F" },
-                  ].map(({ icon: Icon, label, color }) => (
+                  ]?.map(({ icon: Icon, label, color }) => (
                     <div key={label} className="flex items-center gap-2 p-3 rounded-xl border border-primary-50 bg-primary-50/30">
                       <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{ background: `${color}20` }}>

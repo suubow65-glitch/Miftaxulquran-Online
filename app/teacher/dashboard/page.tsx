@@ -110,7 +110,7 @@ export default function TeacherDashboard() {
     addAttendanceLog(newLog);
 
     // Update the enrollment's current pointers
-    const updatedEnrollments = selectedStudent.enrollments.map(e => {
+    const updatedEnrollments = selectedStudent.enrollments?.map(e => {
       if (e.id === selectedEnrollment.id) {
         return {
           ...e,
@@ -172,7 +172,7 @@ export default function TeacherDashboard() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {assignedStudents.map(student => (
+            {assignedStudents?.map(student => (
               <div key={student.id} className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
                 <div className="p-5 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex justify-between items-start mb-2">
@@ -190,7 +190,7 @@ export default function TeacherDashboard() {
                 </div>
                 
                 <div className="p-5 flex-1 space-y-4">
-                  {student.enrollments.filter(e => e.teacherId === teacher.id).map(enroll => (
+                  {student.enrollments.filter(e => e.teacherId === teacher.id)?.map(enroll => (
                     <div key={enroll.id} className="rounded-xl border border-primary-100 bg-primary-50/30 p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <BookOpen className="h-4 w-4 text-primary" />

@@ -40,7 +40,7 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-4">
-              {statsContent.stats.slice(0, 4).map((stat, idx) => {
+              {statsContent.stats.slice(0, 4)?.map((stat, idx) => {
                 const colors = ["#27AE60", "#F0AE20", "#1A8049", "#D4920F"];
                 const color = colors[idx % colors.length];
                 return (
@@ -103,7 +103,7 @@ export default function AboutPage() {
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {aboutContent.values.map((v) => {
+            {aboutContent.values?.map((v) => {
               const Icon = (Icons as any)[v.iconName || "BookOpen"] || Icons.BookOpen;
               return (
                 <div key={v.id} className="rounded-2xl border border-primary-100 bg-white p-7 text-center hover:shadow-xl hover:-translate-y-1 transition-all">
@@ -132,7 +132,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {(!teachers ? [] : teachers).map((t, i) => (
+          {(!teachers ? [] : teachers)?.map((t, i) => (
             <div key={t.id} className="group relative">
               <div className="aspect-[4/5] rounded-[2rem] overflow-hidden bg-primary-50 relative mb-5">
                 {t.imageUrl ? (

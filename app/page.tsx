@@ -25,6 +25,10 @@ function GoldBtn({ href, children, className = "" }: { href: string; children: R
 
 /* ─────────────── Home Page ─────────────── */
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
   return (
     <>
       <HeroSection />
@@ -194,7 +198,7 @@ function HeroSection() {
                 [t("Xifdinta Qur'aanka iyo Tajwiidka", "Quran Memorization & Tajweed")],
                 [t("Koorso Carabiga ee Aasaasiga ah", "Foundation Arabic Language Course")],
                 [t("Daraasadaha Diinta Islaamka", "Islamic Studies")],
-              ].map(([item]) => (
+              ]?.map(([item]) => (
                 <li key={item as string} className="flex items-center gap-2.5 text-primary-100/90 font-medium text-sm">
                   <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-gold-400" />
                   {item}
@@ -208,7 +212,7 @@ function HeroSection() {
                 {t("Luqadaha waxbarashada", "Teaching Languages")}
               </p>
               <div className="flex gap-2 flex-wrap">
-                {["Somali 🇸🇴", "English 🇬🇧", "عربي 🌙"].map((b) => (
+                {["Somali 🇸🇴", "English 🇬🇧", "عربي 🌙"]?.map((b) => (
                   <span key={b} className="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/15 text-white border border-white/20">{b}</span>
                 ))}
               </div>
@@ -239,7 +243,7 @@ function HeroSection() {
             {/* Social proof */}
             <div className="flex items-center gap-4 pt-2">
               <div className="flex -space-x-2">
-                {["A","M","R","S","F"].map((l, i) => (
+                {["A","M","R","S","F"]?.map((l, i) => (
                   <div key={i} className="h-9 w-9 rounded-full border-2 border-primary-700 flex items-center justify-center text-xs font-bold text-gold-300"
                     style={{ background: `linear-gradient(135deg,#1A8049,#0D5C2E)` }}>{l}</div>
                 ))}
@@ -247,7 +251,7 @@ function HeroSection() {
               <div>
                 <p className="text-sm font-bold text-white">2,000+ {t("Arday", "Students")}</p>
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map(i => <Star key={i} className="h-3 w-3 fill-gold-400 text-gold-400" />)}
+                  {[1,2,3,4,5]?.map(i => <Star key={i} className="h-3 w-3 fill-gold-400 text-gold-400" />)}
                   <span className="ml-1 text-xs text-primary-200/70">4.9/5</span>
                 </div>
               </div>
@@ -267,7 +271,7 @@ function HeroSection() {
               <audio ref={audioRef} src={currentTrackUrl} onEnded={handleTrackEnd} playsInline />
 
               {/* ── Slide Images (absolute, fade transition) ── */}
-              {slides.map((slide, idx) => (
+              {slides?.map((slide, idx) => (
                 <img
                   key={slide.id}
                   src={slide.image}
@@ -358,7 +362,7 @@ function HeroSection() {
                       </button>
                     </div>
                     <div className="max-h-48 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-                      {activeTracks.map((track, i) => (
+                      {activeTracks?.map((track, i) => (
                         <button
                           key={track.id}
                           onClick={() => {
@@ -500,7 +504,7 @@ function PainPointsSection() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
-          {challengesContent.cards.map((p) => (
+          {challengesContent.cards?.map((p) => (
             <div key={p.id} className="group rounded-2xl border border-primary-100 bg-white p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 h-14 w-14 rounded-2xl flex items-center justify-center text-2xl bg-primary-50 border border-primary-100 group-hover:scale-110 transition-transform overflow-hidden">
@@ -600,7 +604,7 @@ function WhyChooseUsSection() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {featuresContent.features.map(({ id, iconName, titleSo, titleEn, descSo, descEn }) => {
+          {featuresContent.features?.map(({ id, iconName, titleSo, titleEn, descSo, descEn }) => {
             const Icon = (Icons as any)[iconName || "Star"] || Icons.Star;
             return (
             <div key={id} className="group rounded-2xl border border-primary-100 bg-white p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4">
@@ -643,7 +647,7 @@ function HowItWorksSection() {
           <div className="flex items-center justify-between relative mb-10">
             <div className="absolute left-[16.5%] right-[16.5%] top-4 h-1 rounded-full"
               style={{ background: "linear-gradient(90deg,#27AE60,#F0AE20)" }} />
-            {stepsContent.steps.map((s, idx) => (
+            {stepsContent.steps?.map((s, idx) => (
               <div key={s.id} className="flex flex-col items-center relative z-10" style={{ width: "33%" }}>
                 <div className="h-9 w-9 rounded-full flex items-center justify-center font-black text-sm text-white shadow-lg"
                   style={{ background: idx === 2 ? "linear-gradient(135deg,#F5C84A,#D4920F)" : "linear-gradient(135deg,#27AE60,#0D5C2E)" }}>
@@ -655,7 +659,7 @@ function HowItWorksSection() {
           </div>
 
           <div className="grid grid-cols-3 gap-4 sm:gap-8">
-            {stepsContent.steps.map((s) => {
+            {stepsContent.steps?.map((s) => {
               const Icon = (Icons as any)[s.iconName || "Star"] || Icons.Star;
               return (
                 <div key={s.id} className="flex flex-col items-center text-center">
@@ -700,7 +704,7 @@ function StatsSection() {
           </h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-          {statsContent.stats.map((stat) => {
+          {statsContent.stats?.map((stat) => {
             const Icon = (Icons as any)[stat.iconName || "Star"] || Icons.Star;
             return (
               <div key={stat.id} className="rounded-2xl border border-white/10 bg-white/10 backdrop-blur-sm p-5 text-center hover:bg-white/20 transition-all">
@@ -771,7 +775,7 @@ function TestimonialsSection() {
         
         {reviews.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-6">
-            {reviews.map((r, i) => {
+            {reviews?.map((r, i) => {
               // Parse bilingual seeded content (Somali | English) if it exists
               let displayContent = r.content;
               if (r.content.includes(" | ")) {
@@ -782,8 +786,8 @@ function TestimonialsSection() {
               return (
                 <div key={r.id || i} className="rounded-3xl border border-primary-100 bg-primary-50/30 p-7 hover:shadow-xl hover:-translate-y-1 transition-all">
                   <div className="flex gap-0.5 mb-4">
-                    {[...Array(r.rating)].map((_, j) => <Star key={j} className="h-4 w-4 fill-gold-400 text-gold-400" />)}
-                    {[...Array(5 - r.rating)].map((_, j) => <Star key={j} className="h-4 w-4 text-gray-300" />)}
+                    {[...Array(r.rating)]?.map((_, j) => <Star key={j} className="h-4 w-4 fill-gold-400 text-gold-400" />)}
+                    {[...Array(5 - r.rating)]?.map((_, j) => <Star key={j} className="h-4 w-4 text-gray-300" />)}
                   </div>
                   <p className="text-sm text-gray-700 leading-relaxed mb-6 flex-1">&ldquo;{displayContent}&rdquo;</p>
                   <div className="flex items-center gap-3 pt-4 border-t border-primary-100">
@@ -860,7 +864,7 @@ function TestimonialsSection() {
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5">{t("Qiimeynta", "Rating")}</label>
                     <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map(star => (
+                      {[1, 2, 3, 4, 5]?.map(star => (
                         <button key={star} type="button" onClick={() => setForm({...form, rating: star})} className="p-1 transition-transform hover:scale-110">
                           <Star className={`h-8 w-8 ${star <= form.rating ? "fill-gold-400 text-gold-400" : "text-gray-200"}`} />
                         </button>
@@ -921,7 +925,7 @@ function FaqSection() {
           </h2>
         </div>
         <div className="space-y-3">
-          {faqContent.faqs.map((f, i) => (
+          {faqContent.faqs?.map((f, i) => (
             <div key={f.id} className="rounded-2xl border border-primary-100 bg-white overflow-hidden shadow-sm">
               <button onClick={() => setOpen(open === i ? null : i)}
                 className="w-full flex items-center justify-between px-6 py-5 text-left font-bold text-gray-900 text-sm sm:text-base hover:text-primary transition-colors gap-4">
@@ -1029,7 +1033,7 @@ function PricingSection() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 items-center max-w-5xl mx-auto">
-          {pricingContent.plans.map((plan, index) => {
+          {pricingContent.plans?.map((plan, index) => {
             const isPopular = plan.isPopular;
             
             let cardStyle = "";
@@ -1077,7 +1081,7 @@ function PricingSection() {
                   </div>
 
                   <ul className="space-y-4 mb-8">
-                    {(lang === "so" ? plan.featuresSo : plan.featuresEn).map((feature, i) => (
+                    {(lang === "so" ? plan.featuresSo : plan.featuresEn)?.map((feature, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <CheckCircle2 className={`h-5 w-5 shrink-0 ${checkIconStyle}`} />
                         <span className={`text-sm ${isPopular ? "text-white/90" : "text-gray-700"}`}>
@@ -1192,7 +1196,7 @@ function NewsSection() {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {latestInsights.map((post, i) => (
+          {latestInsights?.map((post, i) => (
             <motion.div 
               key={post.id} 
               initial={{ opacity: 0, y: 20 }}
