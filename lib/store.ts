@@ -568,7 +568,7 @@ export const initialHeroSlides: HeroSlide[] = [
 ];
 
 // Initial default data matching the original hardcoded arrays
-const initialLeads: Lead[] = [
+export const initialLeads: Lead[] = [
   { id: "lead-1", name: "Axmed Cali", age: "15", phone: "+252611234567", email: "axmed@example.com", course: "quran", level: "beginner", schedule: "afternoon", message: "Waxaan rabaa inaan barto qur'aanka.", status: "Pending", createdAt: new Date().toISOString() },
   { id: "lead-2", name: "Aisha Maxamed", age: "22", phone: "+252617654321", email: "", course: "arabic", level: "elementary", schedule: "evening", message: "", status: "Contacted", createdAt: new Date(Date.now() - 86400000).toISOString() },
 ];
@@ -580,7 +580,7 @@ export const initialTeachers: Teacher[] = [
   { id: "t-4", name: "Sh. Cali I.", titleSo: "Macallim — Daraasadaha Diinta", titleEn: "Teacher — Islamic Studies", bioSo: "Khibrad ballaaran u leh dhigista Aqiidada iyo Fiqhiga Islaamka.", bioEn: "Extensive experience teaching Islamic Aqeedah and Fiqh.", imageUrl: "https://i.pravatar.cc/150?img=14" },
 ];
 
-const initialHero: HeroContent = {
+export const initialHero: HeroContent = {
   headlineSo: "Baro Qur'aanka Kariimka adigoo gurigaaga jooga",
   headlineEn: "Learn the Holy Quran from the comfort of your home",
   subheadlineSo: "Miftaxul Quran Online waa dugsi onlayn ah oo kuu fududeynaya barashada Qur'aanka. Waxaan bixinaa fasallo toos ah, macalimiin khibrad leh, iyo jadwal ku habboon waqtigaaga.",
@@ -590,7 +590,7 @@ const initialHero: HeroContent = {
   bgImageUrl: ""
 };
 
-const initialChallengesContent: ChallengesContent = {
+export const initialChallengesContent: ChallengesContent = {
   badgeTextSo: "Su'aalo muhiim ah",
   badgeTextEn: "Important questions",
   mainTitleSo: "Ma la kulantaa caqabadahan?",
@@ -611,7 +611,7 @@ const initialChallengesContent: ChallengesContent = {
   buttonTextEn: "Learn More",
 };
 
-const initialFeaturesContent: FeaturesContent = {
+export const initialFeaturesContent: FeaturesContent = {
   mainHeadingSo: "Maxaad noo dooranaysaa?",
   mainHeadingEn: "Why do you choose us?",
   subHeadingSo: "Miftaxul Quran Online wuxuu isku daraa barnaamij diimeed la hub-siiyey iyo tignoolajiyada tacliinta casri ah.",
@@ -628,7 +628,7 @@ const initialFeaturesContent: FeaturesContent = {
   ]
 };
 
-const initialStepsContent: StepsContent = {
+export const initialStepsContent: StepsContent = {
   mainTitleSo: "Sideen u bilaabaa?",
   mainTitleEn: "How do we get started?",
   ctaButtonTextSo: "Bilaw Hadda — Bilaash",
@@ -640,7 +640,7 @@ const initialStepsContent: StepsContent = {
   ]
 };
 
-const initialStatsContent: StatsContent = {
+export const initialStatsContent: StatsContent = {
   mainTitleSo: "Tirooyinka noo sheega",
   mainTitleEn: "The numbers speak for themselves",
   stats: [
@@ -653,7 +653,7 @@ const initialStatsContent: StatsContent = {
   ]
 };
 
-const initialCourseHelpCTA: CourseHelpCTA = {
+export const initialCourseHelpCTA: CourseHelpCTA = {
   titleSo: "Ma hubtid koorse kuu haboon?",
   titleEn: "Not sure which course fits you?",
   descSo: "Nagala xiriir — 3 maalmood oo tijaabo bilaash ah baa lagugu qaban doonaa si aad u aragto koorse kuu habboon.",
@@ -665,14 +665,14 @@ const initialCourseHelpCTA: CourseHelpCTA = {
   whatsappNumber: "252619337904",
 };
 
-const initialStats: SiteStats = {
+export const initialStats: SiteStats = {
   students: "2,000+",
   teachers: "50+",
   years: "15+",
   countries: "40+"
 };
 
-const initialSettings: SiteSettings = {
+export const initialSettings: SiteSettings = {
   phone: "+252 619 337 904",
   email: "info@miftaxulquran.com",
   addressSo: "Muqdisho, Buulaxuubey, Soomaaliya",
@@ -788,13 +788,13 @@ export const initialCourses: Course[] = [
   },
 ];
 
-const initialLibrary: Book[] = [
+export const initialLibrary: Book[] = [
   { id: "1", title: "Nooraniyya Qaaidah", author: "Sh. Nooraniy", category: "quran", sizeMB: 2.4, pagesSo: "64 bog", pagesEn: "64 pages", downloadUrl: "#", coverImage: "", color: "#27AE60", emoji: "📖" },
   { id: "2", title: "Tajweed Rules", author: "Ibn al-Jazari", category: "tajweed", sizeMB: 3.8, pagesSo: "128 bog", pagesEn: "128 pages", downloadUrl: "#", coverImage: "", color: "#F0AE20", emoji: "📜" },
   { id: "3", title: "Madinah Arabic Book 1", author: "Dr. V. Abdur Rahim", category: "arabic", sizeMB: 12.1, pagesSo: "320 bog", pagesEn: "320 pages", downloadUrl: "#", coverImage: "", color: "#1A8049", emoji: "🔤" },
 ];
 
-const initialFaqContent: FaqContent = {
+export const initialFaqContent: FaqContent = {
   mainHeadingSo: "Su'aalaha Badanaa la Waydiiyo",
   mainHeadingEn: "Frequently Asked Questions",
   faqs: [
@@ -804,7 +804,7 @@ const initialFaqContent: FaqContent = {
   ]
 };
 
-const initialTestimonials: Testimonial[] = [
+export const initialTestimonials: Testimonial[] = [
   { 
     id: "test-1", 
     name: "Faadumo A.", 
@@ -834,7 +834,7 @@ const initialTestimonials: Testimonial[] = [
   },
 ];
 
-const initialBottomCTA: BottomCTAContent = {
+export const initialBottomCTA: BottomCTAContent = {
   badgeSo: "Ku bilow Safarkaga Maanta",
   badgeEn: "Start Your Journey Today",
   titleSo: "Diyaar u tahay inaad furto Buugta Ilaahow?",
@@ -849,14 +849,14 @@ const initialBottomCTA: BottomCTAContent = {
   contactButtonTextEn: "Contact Us"
 };
 
-const initialFooterContent: FooterContent = {
+export const initialFooterContent: FooterContent = {
   aboutSo: "Waxaan bixinaa barashada Qur'aanka, Tacwiidka, iyo Luqadda Carabiga iyada oo macalimiin Ijazah haysta. Meel kasta, waqti kasta.",
   aboutEn: "We provide Quran, Tajweed, and Arabic education with certified Ijazah teachers. Anywhere, anytime.",
   copyrightSo: "Miftaxul Quran Online. Dhammaan xuquuqda way dhowrsan yihihiin.",
   copyrightEn: "Miftaxul Quran Online. All rights reserved."
 };
 
-const initialAboutPageContent: AboutPageContent = {
+export const initialAboutPageContent: AboutPageContent = {
   heroTitleSo: "Magac la aqoontay Barashada Qur'aanka",
   heroTitleEn: "A trusted name in Quran Education",
   heroSubtitleSo: "\"Miftaxul Quran\" wuxuu ula macno yahay \"Furaha Qur'aanka\" — taas ayaan bixinaa: furayaasha Buugta Ilaahow.",
@@ -881,7 +881,7 @@ const initialAboutPageContent: AboutPageContent = {
   ]
 };
 
-const initialLibraryPageContent: LibraryPageContent = {
+export const initialLibraryPageContent: LibraryPageContent = {
   heroBadgeSo: "Buugaagta Bilaashka ah",
   heroBadgeEn: "Free Islamic Books",
   heroTitleSo: "Maktabadda Islaamiga",
@@ -892,14 +892,14 @@ const initialLibraryPageContent: LibraryPageContent = {
   searchPlaceholderEn: "Search books..."
 };
 
-const initialInsightsHeader: InsightsHeader = {
+export const initialInsightsHeader: InsightsHeader = {
   titleSo: "Maqaallo & Warar",
   titleEn: "Blog & News",
   subtitleSo: "La soco wararkii ugu dambeeyay iyo maqaallo faa'iido leh oo ku saabsan barashada Qur'aanka.",
   subtitleEn: "Stay updated with our latest news and beneficial articles about Quran learning."
 };
 
-const initialIjazahContent: IjazahContent = {
+export const initialIjazahContent: IjazahContent = {
   titleSo: "Hel Shahaadadaada Ijazada",
   titleEn: "Get Your Ijazah Certificate",
   subtitleSo: "Shahaado Caalami Ah",
@@ -909,7 +909,7 @@ const initialIjazahContent: IjazahContent = {
   certificateImage: ""
 };
 
-const initialPricingContent: PricingContent = {
+export const initialPricingContent: PricingContent = {
   mainTitleSo: "Qiimaha Barnaamijyada",
   mainTitleEn: "Our Pricing Plans",
   subtitleSo: "Doorashooyin la awoodi karo si aad u hesho waxbarasho tayo leh.",
@@ -985,7 +985,7 @@ const initialPricingContent: PricingContent = {
   ]
 };
 
-const initialPosts: Post[] = [
+export const initialPosts: Post[] = [
   {
     id: "post-1",
     titleSo: "Ahmiyadda Barashada Qur'aanka",
@@ -1022,8 +1022,8 @@ export const initialInsights: Insight[] = [
   }
 ];
 
-const initialStudents: Student[] = [];
-const initialAttendanceLogs: AttendanceLog[] = [];
+export const initialStudents: Student[] = [];
+export const initialAttendanceLogs: AttendanceLog[] = [];
 
 export const useStore = create<CMSState>()(
   persist(
@@ -1396,7 +1396,7 @@ export const useStore = create<CMSState>()(
             });
           }
         } catch (error) {
-          console.warn('Supabase init failed — using local fallbacks:', error);
+          console.error('Supabase init failed. Catching error to prevent hydration crash:', error);
         }
       },
     }),

@@ -1,6 +1,6 @@
 'use client';
 import { useLanguage } from "@/components/language-provider";
-import { useStore, initialInsights } from "@/lib/store";
+import { useStore, initialInsights, initialInsightsHeader } from "@/lib/store";
 import { ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ export default function InsightsPage() {
   useEffect(() => setMounted(true), []);
   const storeInsights = useStore((state) => state.insights) || [];
   const insights = storeInsights.length > 0 ? storeInsights : initialInsights;
-  const insightsHeader = useStore((state) => state.insightsHeader);
+  const insightsHeader = useStore((state) => state.insightsHeader) || initialInsightsHeader;
 
   if (!mounted) return null;
 

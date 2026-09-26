@@ -11,7 +11,11 @@ import * as Icons from "lucide-react";
 import { CoursesList } from "@/components/courses-list";
 import { useLanguage } from "@/components/language-provider";
 import { useStore } from "@/lib/store";
-import { initialHeroSlides } from "@/lib/store";
+import { 
+  initialHeroSlides, initialHero, initialChallengesContent, initialFeaturesContent, 
+  initialStepsContent, initialStatsContent, initialStats, initialSettings,
+  initialTestimonials
+} from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─────────────── Helpers ─────────────── */
@@ -53,10 +57,10 @@ export default function Home() {
 ═══════════════════════════════════════ */
 function HeroSection() {
   const { t, lang } = useLanguage();
-  const hero = useStore(state => state.hero);
-  const settings = useStore(state => state.settings);
-  const tracks = useStore(state => state.tracks);
-  const heroSlides = useStore(state => state.heroSlides);
+  const hero = useStore(state => state.hero) || initialHero;
+  const settings = useStore(state => state.settings) || initialSettings;
+  const tracks = useStore(state => state.tracks) || [];
+  const heroSlides = useStore(state => state.heroSlides) || initialHeroSlides;
   const hasInteractedAudio = useStore(state => state.hasInteractedAudio);
   const setHasInteractedAudio = useStore(state => state.setHasInteractedAudio);
 
@@ -484,9 +488,8 @@ function HeroSection() {
 ═══════════════════════════════════════ */
 function PainPointsSection() {
   const { t, lang } = useLanguage();
-  const challengesContent = useStore(s => s.challengesContent);
+  const challengesContent = useStore(s => s.challengesContent) || initialChallengesContent;
 
-  // Fallback to avoid breaking if store isn't hydrated yet or empty
   if (!challengesContent || !challengesContent.cards) return null;
 
   return (
@@ -582,7 +585,7 @@ function CoursesPreviewSection() {
 ═══════════════════════════════════════ */
 function WhyChooseUsSection() {
   const { t, lang } = useLanguage();
-  const featuresContent = useStore(state => state.featuresContent);
+  const featuresContent = useStore(state => state.featuresContent) || initialFeaturesContent;
 
   if (!featuresContent) return null;
 
@@ -627,7 +630,7 @@ function WhyChooseUsSection() {
 ═══════════════════════════════════════ */
 function HowItWorksSection() {
   const { lang } = useLanguage();
-  const stepsContent = useStore(state => state.stepsContent);
+  const stepsContent = useStore(state => state.stepsContent) || initialStepsContent;
 
   if (!stepsContent) return null;
 
@@ -690,7 +693,7 @@ function HowItWorksSection() {
 ═══════════════════════════════════════ */
 function StatsSection() {
   const { lang } = useLanguage();
-  const statsContent = useStore(state => state.statsContent);
+  const statsContent = useStore(state => state.statsContent) || initialStatsContent;
 
   if (!statsContent) return null;
 
@@ -728,7 +731,7 @@ function StatsSection() {
 ═══════════════════════════════════════ */
 function TestimonialsSection() {
   const { lang, t } = useLanguage();
-  const testimonials = useStore(state => state.testimonials);
+  const testimonials = useStore(state => state.testimonials) || initialTestimonials;
   const submitTestimonial = useStore(state => state.submitTestimonial);
   
   const reviews = testimonials.filter(t => t.isApproved);

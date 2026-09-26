@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo } from 'react';
 import { useStore } from "@/lib/store";
-import { initialTeachers } from "@/lib/store";
+import { initialTeachers, initialStudents, initialAttendanceLogs } from "@/lib/store";
 import {
   Search, Award, AlertCircle, Calendar, BookOpen,
   Quote, Download, Star, TrendingUp, Flame, Clock
@@ -36,8 +36,8 @@ export default function TrackPage() {
   const storePayments       = useStore(s => s.payments) || [];
   const storeExams          = useStore(s => s.exams) || [];
 
-  const students = storeStudents.length > 0 ? storeStudents : [];
-  const attendanceLogs = storeAttendanceLogs.length > 0 ? storeAttendanceLogs : [];
+  const students = storeStudents.length > 0 ? storeStudents : initialStudents;
+  const attendanceLogs = storeAttendanceLogs.length > 0 ? storeAttendanceLogs : initialAttendanceLogs;
   const teachers = storeTeachers.length > 0 ? storeTeachers : initialTeachers;
   const payments = storePayments.length > 0 ? storePayments : [];
   const exams = storeExams.length > 0 ? storeExams : [];
