@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from './supabase';
 
 export type Category = "quran" | "tajweed" | "arabic" | "islamic" | "seerah" | "all";
 
@@ -539,7 +538,6 @@ interface CMSState {
   addExam: (exam: Exam) => void;
   updateExam: (id: string, exam: Exam) => void;
   deleteExam: (id: string) => void;
-  initializeSupabase: () => Promise<void>;
 }
 
 export const initialHeroSlides: HeroSlide[] = [
@@ -1124,88 +1122,44 @@ export const useStore = create<CMSState>()(
       })),
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
-      initializeSupabase: async () => {
-        try {
-          const [
-            { data: students, error: studentsErr },
-            { data: teachers, error: teachersErr },
-            { data: attendances, error: attendancesErr },
-            { data: payments, error: paymentsErr },
-            { data: exams, error: examsErr },
-          ] = await Promise.all([
-            supabase.from('students').select('*'),
-            supabase.from('teachers').select('*'),
-            supabase.from('attendance_logs').select('*'),
-            supabase.from('payments').select('*'),
-            supabase.from('exams').select('*'),
-          ]);
-
-          if (studentsErr) console.warn("Error fetching students:", studentsErr);
-          if (teachersErr) console.warn("Error fetching teachers:", teachersErr);
-          if (attendancesErr) console.warn("Error fetching attendances:", attendancesErr);
-          if (paymentsErr) console.warn("Error fetching payments:", paymentsErr);
-          if (examsErr) console.warn("Error fetching exams:", examsErr);
-
-          if (students && students.length > 0) set({ students: students as any });
-          if (teachers && teachers.length > 0) set({ teachers: teachers as any });
-          if (attendances && attendances.length > 0) set({ attendanceLogs: attendances as any });
-          if (payments && payments.length > 0) set({ payments: payments as any });
-          if (exams && exams.length > 0) set({ exams: exams as any });
-        } catch (error) {
-          console.warn("Failed to fetch Supabase data. Using local fallbacks:", error);
-        }
-      },
-
-      addStudent: async (student) => {
+      addStudent: (student) => {
         set(state => ({ students: [...state.students, student] }));
-        await supabase.from('students').insert(student);
       },
-      updateStudent: async (id, student) => {
+      updateStudent: (id, student) => {
         set(state => ({ students: state.students.map(s => s.id === id ? student : s) }));
-        await supabase.from('students').update(student).eq('id', id);
       },
-      deleteStudent: async (id) => {
+      deleteStudent: (id) => {
         set(state => ({ students: state.students.filter(s => s.id !== id) }));
-        await supabase.from('students').delete().eq('id', id);
       },
 
-      addAttendanceLog: async (log) => {
+      addAttendanceLog: (log) => {
         set(state => ({ attendanceLogs: [...state.attendanceLogs, log] }));
-        await supabase.from('attendance_logs').insert(log);
       },
-      updateAttendanceLog: async (id, log) => {
+      updateAttendanceLog: (id, log) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) }));
-        await supabase.from('attendance_logs').update(log).eq('id', id);
       },
-      deleteAttendanceLog: async (id) => {
+      deleteAttendanceLog: (id) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) }));
-        await supabase.from('attendance_logs').delete().eq('id', id);
       },
 
-      addPayment: async (payment) => {
+      addPayment: (payment) => {
         set(state => ({ payments: [payment, ...state.payments] }));
-        await supabase.from('payments').insert(payment);
       },
-      updatePayment: async (id, payment) => {
+      updatePayment: (id, payment) => {
         set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) }));
-        await supabase.from('payments').update(payment).eq('id', id);
       },
-      deletePayment: async (id) => {
+      deletePayment: (id) => {
         set(state => ({ payments: state.payments.filter(p => p.id !== id) }));
-        await supabase.from('payments').delete().eq('id', id);
       },
 
-      addExam: async (exam) => {
+      addExam: (exam) => {
         set(state => ({ exams: [exam, ...state.exams] }));
-        await supabase.from('exams').insert(exam);
       },
-      updateExam: async (id, exam) => {
+      updateExam: (id, exam) => {
         set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) }));
-        await supabase.from('exams').update(exam).eq('id', id);
       },
-      deleteExam: async (id) => {
+      deleteExam: (id) => {
         set(state => ({ exams: state.exams.filter(e => e.id !== id) }));
-        await supabase.from('exams').delete().eq('id', id);
       },
     }),
     {
