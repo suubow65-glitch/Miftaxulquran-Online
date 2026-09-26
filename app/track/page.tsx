@@ -1,6 +1,7 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import { useStore } from "@/lib/store";
+import { initialTeachers } from "@/lib/store";
 import {
   Search, Award, AlertCircle, Calendar, BookOpen,
   Quote, Download, Star, TrendingUp, Flame, Clock
@@ -29,11 +30,17 @@ type HeatStatus = "attended" | "absent" | "leave" | "none";
 export default function TrackPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const students       = useStore(s => s.students) || [];
-  const attendanceLogs = useStore(s => s.attendanceLogs) || [];
-  const teachers       = useStore(s => s.teachers) || [];
-  const payments       = useStore(s => s.payments) || [];
-  const exams          = useStore(s => s.exams) || [];
+  const storeStudents       = useStore(s => s.students) || [];
+  const storeAttendanceLogs = useStore(s => s.attendanceLogs) || [];
+  const storeTeachers       = useStore(s => s.teachers) || [];
+  const storePayments       = useStore(s => s.payments) || [];
+  const storeExams          = useStore(s => s.exams) || [];
+
+  const students = storeStudents.length > 0 ? storeStudents : [];
+  const attendanceLogs = storeAttendanceLogs.length > 0 ? storeAttendanceLogs : [];
+  const teachers = storeTeachers.length > 0 ? storeTeachers : initialTeachers;
+  const payments = storePayments.length > 0 ? storePayments : [];
+  const exams = storeExams.length > 0 ? storeExams : [];
 
   const [query,        setQuery]        = useState("");
   const [hasSearched,  setHasSearched]  = useState(false);

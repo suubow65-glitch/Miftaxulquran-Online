@@ -1,6 +1,6 @@
 "use client";
 
-import { useStore, Course as StoreCourse } from "@/lib/store";
+import { useStore, Course as StoreCourse, initialCourses } from "@/lib/store";
 import * as Icons from "lucide-react";
 import { ArrowRight, Clock, Users, Award, Star, X, CheckCircle2, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -42,7 +42,8 @@ const defaultConfig = {
 };
 
 export function CoursesList({ filterCategory = "all" }: { filterCategory?: string }) {
-  const storeCourses = useStore((state) => state.courses) || [];
+  const rawStoreCourses = useStore((state) => state.courses) || [];
+  const storeCourses = rawStoreCourses.length > 0 ? rawStoreCourses : initialCourses;
   const courseHelpCTA = useStore((state) => state.courseHelpCTA);
   const [isClient, setIsClient] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<StoreCourse | null>(null);

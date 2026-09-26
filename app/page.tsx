@@ -11,6 +11,7 @@ import * as Icons from "lucide-react";
 import { CoursesList } from "@/components/courses-list";
 import { useLanguage } from "@/components/language-provider";
 import { useStore } from "@/lib/store";
+import { initialHeroSlides } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─────────────── Helpers ─────────────── */
@@ -79,9 +80,7 @@ function HeroSection() {
   }, []);
 
   // Use store slides or fall back to defaults if store is empty
-  const slides = heroSlides.length > 0 ? heroSlides : [
-    { id: "fallback-1", image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&q=80&w=800", hadithAr: "", hadithSo: "", hadithEn: "" },
-  ];
+  const slides = heroSlides && heroSlides.length > 0 ? heroSlides : initialHeroSlides;
 
   useEffect(() => {
     if (slides.length <= 1) return;

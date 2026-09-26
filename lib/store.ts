@@ -542,7 +542,7 @@ interface CMSState {
   initializeSupabase: () => Promise<void>;
 }
 
-const initialHeroSlides: HeroSlide[] = [
+export const initialHeroSlides: HeroSlide[] = [
   {
     id: "slide-1",
     image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&q=80&w=900",
@@ -572,7 +572,7 @@ const initialLeads: Lead[] = [
   { id: "lead-2", name: "Aisha Maxamed", age: "22", phone: "+252617654321", email: "", course: "arabic", level: "elementary", schedule: "evening", message: "", status: "Contacted", createdAt: new Date(Date.now() - 86400000).toISOString() },
 ];
 
-const initialTeachers: Teacher[] = [
+export const initialTeachers: Teacher[] = [
   { id: "t-1", name: "Sh. Axmed C.", titleSo: "Macallimka Sarreea — Qur'aan & Tajwiid", titleEn: "Senior Teacher — Quran & Tajweed", bioSo: "Khibrad 15 sano ah oo dhigista Qur'aanka. Wuxuu hayaa Ijazah qira'at toban ah.", bioEn: "15 years of experience teaching Quran. Holds Ijazah in 10 Qira'at.", imageUrl: "https://i.pravatar.cc/150?img=11" },
   { id: "t-2", name: "Ustaa Maxamed X.", titleSo: "Macallim — Luqadda Carabiga", titleEn: "Teacher — Arabic Language", bioSo: "Macallin ku takhasusay luqadda Carabiga, wuxuuna ka qalin jabiyay Jaamacadda Madiina.", bioEn: "Specialized Arabic teacher, graduated from the Islamic University of Madinah.", imageUrl: "https://i.pravatar.cc/150?img=12" },
   { id: "t-3", name: "Macallimad Faadumo", titleSo: "Macallimad — Dumartu Qur'aan", titleEn: "Female Teacher — Women's Quran", bioSo: "Macallimad u heellan bixinta casharada haweenka iyo gabdhaha. Waxay haysataa Ijazah caafimaad ah.", bioEn: "Dedicated teacher for women and girls. Holds authentic Ijazah.", imageUrl: "https://i.pravatar.cc/150?img=9" },
@@ -688,7 +688,7 @@ const initialSettings: SiteSettings = {
   isTeacherLive: true
 };
 
-const initialCourses: Course[] = [
+export const initialCourses: Course[] = [
   {
     id: "quran", category: "quran",
     titleSo: "Xifdinta Qur'aanka (Hifz)", titleEn: "Quran Memorization (Hifz)",
@@ -996,7 +996,7 @@ const initialPosts: Post[] = [
   }
 ];
 
-const initialInsights: Insight[] = [
+export const initialInsights: Insight[] = [
   {
     id: "insight-1",
     image: "https://images.unsplash.com/photo-1609599006353-e629aaab31ce?auto=format&fit=crop&q=80&w=800",
