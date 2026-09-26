@@ -47,23 +47,7 @@ export default function TrackPage() {
   const [student,      setStudent]      = useState<any>(null);
   const [activeSubject, setActiveSubject] = useState<string>("");
 
-  if (!mounted) return null;
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const found = students.find(s => s.studentId === query.trim().toUpperCase());
-    setStudent(found || null);
-    setHasSearched(true);
-    if (found?.enrollments?.length) {
-      setActiveSubject(found.enrollments[0].subjectName);
-    } else {
-      setActiveSubject("");
-    }
-  };
-
-  const activeEnrollment  = student?.enrollments?.find((e: any) => e.subjectName === activeSubject);
-  const assignedTeacher   = teachers.find(t => t.id === activeEnrollment?.teacherId);
-
+  // All useMemo hooks declared unconditionally (Rules of Hooks)
   const subjectLogs = useMemo(() => {
     if (!student || !activeSubject) return [];
     return [...attendanceLogs]
@@ -71,20 +55,7 @@ export default function TrackPage() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [attendanceLogs, student, activeSubject]);
 
-  const studentExams = exams?.filter(e => e.studentId === student?.id) || [];
-  const activeMonth = new Date().toLocaleString("en-US", { month: "long", year: "numeric" });
-  const isPaid = payments?.some(p => p.studentId === student?.id && p.month === activeMonth && p.status === "Paid");
-
-  const presentCount   = subjectLogs.filter(l => l.status.includes("Qaatay")).length;
-  const attendanceRate = subjectLogs.length === 0 ? 0 : Math.round((presentCount / subjectLogs.length) * 100);
-  const recentLogs     = subjectLogs.slice(0, 6);
-  const lastParentNote = subjectLogs.find(l => l.parentNote?.trim());
-  const currentJuz     = activeEnrollment?.currentJuz ? parseInt(activeEnrollment.currentJuz) : 0;
-  const quranPct       = Math.min(Math.round((currentJuz / 30) * 100), 100);
-  const isQuran        = isQuranType(activeSubject);
-
-  // Heatmap: last 30 days
-  const heatmapDays = useMemo((): Array<{ date: Date; status: HeatStatus }> => {
+  const heatmapDaysRaw = useMemo((): Array<{ date: Date; status: HeatStatus }> => {
     const days = [];
     const today = new Date();
     for (let i = 29; i >= 0; i--) {
@@ -102,6 +73,35 @@ export default function TrackPage() {
     }
     return days;
   }, [subjectLogs]);
+
+  // Derived values (no hooks, safe to compute here)
+  const activeEnrollment  = student?.enrollments?.find((e: any) => e.subjectName === activeSubject);
+  const assignedTeacher   = teachers.find(t => t.id === activeEnrollment?.teacherId);
+  const studentExams = exams?.filter(e => e.studentId === student?.id) || [];
+  const activeMonth = new Date().toLocaleString("en-US", { month: "long", year: "numeric" });
+  const isPaid = payments?.some(p => p.studentId === student?.id && p.month === activeMonth && p.status === "Paid");
+  const presentCount   = subjectLogs.filter(l => l.status.includes("Qaatay")).length;
+  const attendanceRate = subjectLogs.length === 0 ? 0 : Math.round((presentCount / subjectLogs.length) * 100);
+  const recentLogs     = subjectLogs.slice(0, 6);
+  const lastParentNote = subjectLogs.find(l => l.parentNote?.trim());
+  const currentJuz     = activeEnrollment?.currentJuz ? parseInt(activeEnrollment.currentJuz) : 0;
+  const quranPct       = Math.min(Math.round((currentJuz / 30) * 100), 100);
+  const isQuran        = isQuranType(activeSubject);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const found = students.find(s => s.studentId === query.trim().toUpperCase());
+    setStudent(found || null);
+    setHasSearched(true);
+    if (found?.enrollments?.length) {
+      setActiveSubject(found.enrollments[0].subjectName);
+    } else {
+      setActiveSubject("");
+    }
+  };
+
+  // Guard render until hydration is complete — placed AFTER all hooks
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen relative overflow-x-hidden"
@@ -391,7 +391,7 @@ export default function TrackPage() {
                           </div>
                         </div>
                         <div className="grid grid-cols-10 gap-1.5">
-                          {heatmapDays?.map((day, i) => (
+                          {heatmapDaysRaw?.map((day, i) => (
                             <div
                               key={i}
                               title={`${day.date.toLocaleDateString()} — ${day.status}`}
