@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from './supabase';
 
 export type Category = "quran" | "tajweed" | "arabic" | "islamic" | "seerah" | "all";
 
@@ -538,6 +539,8 @@ interface CMSState {
   addExam: (exam: Exam) => void;
   updateExam: (id: string, exam: Exam) => void;
   deleteExam: (id: string) => void;
+  // ── Bootstrap ──────────────────────────────────────────
+  initializeSupabase: () => Promise<void>;
 }
 
 export const initialHeroSlides: HeroSlide[] = [
@@ -1100,20 +1103,67 @@ export const useStore = create<CMSState>()(
       updateLeadStatus: (id, status) => set(state => ({ leads: state.leads.map(l => l.id === id ? { ...l, status } : l) })),
       deleteLead: (id) => set(state => ({ leads: state.leads.filter(l => l.id !== id) })),
 
-      addTeacher: (teacher) => set(state => ({ teachers: [...state.teachers, teacher] })),
-      updateTeacher: (id, teacher) => set(state => ({ teachers: state.teachers.map(t => t.id === id ? teacher : t) })),
-      deleteTeacher: (id) => set(state => ({ teachers: state.teachers.filter(t => t.id !== id) })),
-      updateTeacherCredentials: (id, username, password) => set(state => ({
-        teachers: state.teachers.map(t => t.id === id ? { ...t, username, password } : t)
-      })),
+
+      // ── TEACHERS (optimistic + Supabase sync) ────────────────
+      addTeacher: (teacher) => {
+        set(state => ({ teachers: [...state.teachers, teacher] }));
+        supabase.from('teachers').insert({
+          id: teacher.id, name: teacher.name,
+          title_so: teacher.titleSo, title_en: teacher.titleEn,
+          bio_so: teacher.bioSo, bio_en: teacher.bioEn,
+          image_url: teacher.imageUrl,
+          username: teacher.username, password: teacher.password,
+        }).then(({ error }) => { if (error) console.warn('Teacher insert:', error.message); });
+      },
+      updateTeacher: (id, teacher) => {
+        set(state => ({ teachers: state.teachers.map(t => t.id === id ? teacher : t) }));
+        supabase.from('teachers').update({
+          name: teacher.name,
+          title_so: teacher.titleSo, title_en: teacher.titleEn,
+          bio_so: teacher.bioSo, bio_en: teacher.bioEn,
+          image_url: teacher.imageUrl,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Teacher update:', error.message); });
+      },
+      deleteTeacher: (id) => {
+        set(state => ({ teachers: state.teachers.filter(t => t.id !== id) }));
+        supabase.from('teachers').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Teacher delete:', error.message); });
+      },
+      updateTeacherCredentials: (id, username, password) => {
+        set(state => ({ teachers: state.teachers.map(t => t.id === id ? { ...t, username, password } : t) }));
+        supabase.from('teachers').update({ username, password }).eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Teacher creds update:', error.message); });
+      },
 
       addPost: (post) => set(state => ({ posts: [post, ...state.posts] })),
       updatePost: (id, post) => set(state => ({ posts: state.posts.map(p => p.id === id ? post : p) })),
       deletePost: (id) => set(state => ({ posts: state.posts.filter(p => p.id !== id) })),
 
-      addInsight: (insight) => set(state => ({ insights: [insight, ...state.insights] })),
-      updateInsight: (id, insight) => set(state => ({ insights: state.insights.map(p => p.id === id ? insight : p) })),
-      deleteInsight: (id) => set(state => ({ insights: state.insights.filter(p => p.id !== id) })),
+      addInsight: (insight) => {
+        set(state => ({ insights: [insight, ...state.insights] }));
+        supabase.from('insights').insert({
+          id: insight.id, image: insight.image,
+          category_so: insight.categorySo, category_en: insight.categoryEn,
+          title_so: insight.titleSo, title_en: insight.titleEn,
+          content_so: insight.contentSo, content_en: insight.contentEn,
+          date: insight.date,
+        }).then(({ error }) => { if (error) console.warn('Insight insert:', error.message); });
+      },
+      updateInsight: (id, insight) => {
+        set(state => ({ insights: state.insights.map(p => p.id === id ? insight : p) }));
+        supabase.from('insights').update({
+          image: insight.image,
+          category_so: insight.categorySo, category_en: insight.categoryEn,
+          title_so: insight.titleSo, title_en: insight.titleEn,
+          content_so: insight.contentSo, content_en: insight.contentEn,
+          date: insight.date,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Insight update:', error.message); });
+      },
+      deleteInsight: (id) => {
+        set(state => ({ insights: state.insights.filter(p => p.id !== id) }));
+        supabase.from('insights').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Insight delete:', error.message); });
+      },
 
       addTrack: (track) => set(state => ({ tracks: [track, ...state.tracks] })),
       deleteTrack: (id) => set(state => ({ tracks: state.tracks.filter(t => t.id !== id) })),
@@ -1122,44 +1172,232 @@ export const useStore = create<CMSState>()(
       })),
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
+      // ── STUDENTS (optimistic + Supabase sync) ────────────────
       addStudent: (student) => {
         set(state => ({ students: [...state.students, student] }));
+        supabase.from('students').insert({
+          id: student.id, student_id: student.studentId,
+          name: student.name, status: student.status,
+          class_days: student.classDays, class_time: student.classTime,
+        }).then(({ error }) => {
+          if (error) { console.warn('Student insert:', error.message); return; }
+          // persist enrollments
+          if (student.enrollments?.length) {
+            supabase.from('enrollments').insert(
+              student.enrollments.map(e => ({
+                id: e.id, student_id: student.id,
+                subject_name: e.subjectName, teacher_id: e.teacherId,
+                level: e.level, status: e.status,
+                total_lessons: e.totalLessons,
+                current_juz: e.currentJuz, current_hizb: e.currentHizb,
+                current_surah: e.currentSurah, current_ayah: e.currentAyah,
+                current_lesson: e.currentLesson, current_page: e.currentPage,
+              }))
+            ).then(({ error: ee }) => { if (ee) console.warn('Enroll insert:', ee.message); });
+          }
+        });
       },
       updateStudent: (id, student) => {
         set(state => ({ students: state.students.map(s => s.id === id ? student : s) }));
+        supabase.from('students').update({
+          student_id: student.studentId, name: student.name,
+          status: student.status, class_days: student.classDays, class_time: student.classTime,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Student update:', error.message); });
       },
       deleteStudent: (id) => {
         set(state => ({ students: state.students.filter(s => s.id !== id) }));
+        supabase.from('students').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Student delete:', error.message); });
       },
 
+      // ── ATTENDANCE LOGS ──────────────────────────────────────
       addAttendanceLog: (log) => {
         set(state => ({ attendanceLogs: [...state.attendanceLogs, log] }));
+        supabase.from('attendance_logs').insert({
+          id: log.id, student_id: log.studentId,
+          date: log.date, subject: log.subject, subject_id: log.subjectId,
+          status: log.status,
+          juz: log.juz, hizb: log.hizb,
+          surah_started: log.surahStarted, ayah_started: log.ayahStarted,
+          surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
+          book_name: log.bookName,
+          lesson_started: log.lessonStarted, page_started: log.pageStarted,
+          lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
+          teacher_note: log.teacherNote, parent_note: log.parentNote,
+        }).then(({ error }) => { if (error) console.warn('Attendance insert:', error.message); });
       },
       updateAttendanceLog: (id, log) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) }));
+        supabase.from('attendance_logs').update({
+          date: log.date, subject: log.subject,
+          status: log.status, juz: log.juz, hizb: log.hizb,
+          surah_started: log.surahStarted, ayah_started: log.ayahStarted,
+          surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
+          book_name: log.bookName,
+          lesson_started: log.lessonStarted, page_started: log.pageStarted,
+          lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
+          teacher_note: log.teacherNote, parent_note: log.parentNote,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Attendance update:', error.message); });
       },
       deleteAttendanceLog: (id) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) }));
+        supabase.from('attendance_logs').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Attendance delete:', error.message); });
       },
 
+      // ── PAYMENTS ────────────────────────────────────────────
       addPayment: (payment) => {
         set(state => ({ payments: [payment, ...state.payments] }));
+        supabase.from('payments').insert({
+          id: payment.id, student_id: payment.studentId,
+          month: payment.month, amount: payment.amount,
+          status: payment.status, date_paid: payment.datePaid,
+        }).then(({ error }) => { if (error) console.warn('Payment insert:', error.message); });
       },
       updatePayment: (id, payment) => {
         set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) }));
+        supabase.from('payments').update({
+          month: payment.month, amount: payment.amount,
+          status: payment.status, date_paid: payment.datePaid,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Payment update:', error.message); });
       },
       deletePayment: (id) => {
         set(state => ({ payments: state.payments.filter(p => p.id !== id) }));
+        supabase.from('payments').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Payment delete:', error.message); });
       },
 
+      // ── EXAMS ───────────────────────────────────────────────
       addExam: (exam) => {
         set(state => ({ exams: [exam, ...state.exams] }));
+        supabase.from('exams').insert({
+          id: exam.id, student_id: exam.studentId,
+          subject: exam.subject, teacher_id: exam.teacherId,
+          score: exam.score, grade: exam.grade,
+          term: exam.term, date: exam.date,
+        }).then(({ error }) => { if (error) console.warn('Exam insert:', error.message); });
       },
       updateExam: (id, exam) => {
         set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) }));
+        supabase.from('exams').update({
+          subject: exam.subject, teacher_id: exam.teacherId,
+          score: exam.score, grade: exam.grade,
+          term: exam.term, date: exam.date,
+        }).eq('id', id).then(({ error }) => { if (error) console.warn('Exam update:', error.message); });
       },
       deleteExam: (id) => {
         set(state => ({ exams: state.exams.filter(e => e.id !== id) }));
+        supabase.from('exams').delete().eq('id', id)
+          .then(({ error }) => { if (error) console.warn('Exam delete:', error.message); });
+      },
+
+      // ── BOOTSTRAP: load live data from Supabase on app start ──
+      initializeSupabase: async () => {
+        try {
+          const [studentsRes, teachersRes, attendanceRes, paymentsRes, examsRes,
+                 enrollmentsRes, heroSlidesRes, insightsRes] = await Promise.all([
+            supabase.from('students').select('*'),
+            supabase.from('teachers').select('*'),
+            supabase.from('attendance_logs').select('*'),
+            supabase.from('payments').select('*'),
+            supabase.from('exams').select('*'),
+            supabase.from('enrollments').select('*'),
+            supabase.from('hero_slides').select('*').order('sort_order'),
+            supabase.from('insights').select('*').order('date', { ascending: false }),
+          ]);
+
+          // Map DB snake_case → TS camelCase
+          if (studentsRes.data && studentsRes.data.length > 0) {
+            const enrollments: any[] = enrollmentsRes.data ?? [];
+            const mapped = studentsRes.data.map((s: any) => ({
+              id: s.id, studentId: s.student_id, name: s.name,
+              status: s.status, classDays: s.class_days, classTime: s.class_time,
+              enrollments: enrollments
+                .filter((e: any) => e.student_id === s.id)
+                .map((e: any) => ({
+                  id: e.id, subjectName: e.subject_name, teacherId: e.teacher_id,
+                  level: e.level, status: e.status, totalLessons: e.total_lessons,
+                  currentJuz: e.current_juz, currentHizb: e.current_hizb,
+                  currentSurah: e.current_surah, currentAyah: e.current_ayah,
+                  currentLesson: e.current_lesson, currentPage: e.current_page,
+                })),
+            }));
+            set({ students: mapped });
+          }
+
+          if (teachersRes.data && teachersRes.data.length > 0) {
+            set({
+              teachers: teachersRes.data.map((t: any) => ({
+                id: t.id, name: t.name,
+                titleSo: t.title_so, titleEn: t.title_en,
+                bioSo: t.bio_so, bioEn: t.bio_en,
+                imageUrl: t.image_url,
+                username: t.username, password: t.password,
+              }))
+            });
+          }
+
+          if (attendanceRes.data && attendanceRes.data.length > 0) {
+            set({
+              attendanceLogs: attendanceRes.data.map((l: any) => ({
+                id: l.id, studentId: l.student_id,
+                date: l.date, subject: l.subject, subjectId: l.subject_id,
+                status: l.status,
+                juz: l.juz, hizb: l.hizb,
+                surahStarted: l.surah_started, ayahStarted: l.ayah_started,
+                surahEnded: l.surah_ended, ayahEnded: l.ayah_ended,
+                bookName: l.book_name,
+                lessonStarted: l.lesson_started, pageStarted: l.page_started,
+                lessonEnded: l.lesson_ended, pageEnded: l.page_ended,
+                teacherNote: l.teacher_note, parentNote: l.parent_note,
+              }))
+            });
+          }
+
+          if (paymentsRes.data && paymentsRes.data.length > 0) {
+            set({
+              payments: paymentsRes.data.map((p: any) => ({
+                id: p.id, studentId: p.student_id,
+                month: p.month, amount: p.amount,
+                status: p.status, datePaid: p.date_paid,
+              }))
+            });
+          }
+
+          if (examsRes.data && examsRes.data.length > 0) {
+            set({
+              exams: examsRes.data.map((e: any) => ({
+                id: e.id, studentId: e.student_id,
+                subject: e.subject, teacherId: e.teacher_id,
+                score: e.score, grade: e.grade,
+                term: e.term, date: e.date,
+              }))
+            });
+          }
+
+          if (heroSlidesRes.data && heroSlidesRes.data.length > 0) {
+            set({
+              heroSlides: heroSlidesRes.data.map((s: any) => ({
+                id: s.id, image: s.image,
+                hadithAr: s.hadith_ar, hadithSo: s.hadith_so, hadithEn: s.hadith_en,
+              }))
+            });
+          }
+
+          if (insightsRes.data && insightsRes.data.length > 0) {
+            set({
+              insights: insightsRes.data.map((i: any) => ({
+                id: i.id, image: i.image,
+                categorySo: i.category_so, categoryEn: i.category_en,
+                titleSo: i.title_so, titleEn: i.title_en,
+                contentSo: i.content_so, contentEn: i.content_en,
+                date: i.date,
+              }))
+            });
+          }
+        } catch (error) {
+          console.warn('Supabase init failed — using local fallbacks:', error);
+        }
       },
     }),
     {
