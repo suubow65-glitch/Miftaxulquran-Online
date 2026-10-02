@@ -74,9 +74,9 @@ function HeroSection() {
   const activeTracks = tracks.filter(t => t.isActive);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const currentTrack = activeTracks[currentTrackIndex];
-  const currentTrackUrl = currentTrack?.audioDataUrl || "";
-  const currentTrackName = currentTrack?.title || "Quran Recitation";
-  const currentReciterName = currentTrack?.reciter || "";
+  const currentTrackUrl = currentTrack?.audioDataUrl || "https://server8.mp3quran.net/afs/001.mp3";
+  const currentTrackName = currentTrack?.title || "Al-Fatiha";
+  const currentReciterName = currentTrack?.reciter || "Mishary Al-Afasy";
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -271,7 +271,15 @@ function HeroSection() {
             <div className="relative rounded-[2rem] border border-white/20 shadow-2xl overflow-hidden"
               style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(40px) saturate(180%)", aspectRatio: "4/5", display: "flex", flexDirection: "column" }}>
 
-              <audio ref={audioRef} src={currentTrackUrl} onEnded={handleTrackEnd} playsInline />
+              {currentTrackUrl && (
+                <audio 
+                  ref={audioRef} 
+                  src={currentTrackUrl} 
+                  onEnded={handleTrackEnd} 
+                  onError={(e) => console.error("Audio playback error:", e)}
+                  playsInline 
+                />
+              )}
 
               {/* ── Slide Images (absolute, fade transition) ── */}
               {slides?.map((slide, idx) => (
