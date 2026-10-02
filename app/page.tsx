@@ -113,10 +113,13 @@ function HeroSection() {
       
       if (hasStarted && isPlaying) {
         const timer = setTimeout(() => {
-          audioRef.current?.play().catch((e) => {
-            console.error("Play failed:", e);
-            setIsPlaying(false);
-          });
+          const playPromise = audioRef.current?.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              console.warn("Audio skipped");
+              setIsPlaying(false);
+            });
+          }
         }, 50);
         return () => clearTimeout(timer);
       }
@@ -147,8 +150,17 @@ function HeroSection() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true);
+        }).catch(() => {
+          console.warn("Audio skipped");
+          setIsPlaying(false);
+        });
+      } else {
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -279,10 +291,13 @@ function HeroSection() {
                   src={currentTrackUrl} 
                   onEnded={handleTrackEnd} 
                   onError={(e) => {
-                    console.error("Audio playback error:", e);
-                    setFallbackUrl("https://server8.mp3quran.net/afs/001.mp3");
-                    setShowAudioError(true);
-                    setTimeout(() => setShowAudioError(false), 6000);
+                    console.warn("Audio skipped");
+                    setIsPlaying(false);
+                    if (!fallbackUrl) {
+                      setFallbackUrl("https://server8.mp3quran.net/afs/001.mp3");
+                      setShowAudioError(true);
+                      setTimeout(() => setShowAudioError(false), 6000);
+                    }
                   }}
                   playsInline 
                 />
