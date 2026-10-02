@@ -347,16 +347,29 @@ function ExamsModule() {
 }
 
 /* ═══════════════════════ MAIN DASHBOARD ═══════════════════════ */
+import { supabase } from "@/lib/supabase";
+
 export default function AdminDashboard() {
   const [module, setModule] = useState<Module>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/admin/login");
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   const initializeSupabase = useStore((s) => s.initializeSupabase);
   useEffect(() => { initializeSupabase(); }, [initializeSupabase]);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await supabase.auth.signOut();
+    document.cookie = "miftaxul_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/admin/login");
   };
 

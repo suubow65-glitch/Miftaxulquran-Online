@@ -6,6 +6,7 @@ import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut, BookOpen, Clock, Check, Save, X, Settings, User, AlertCircle, FileText, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function TeacherDashboard() {
   const router = useRouter();
@@ -30,29 +31,31 @@ export default function TeacherDashboard() {
   });
 
   useEffect(() => {
-    const session = localStorage.getItem("teacher_session");
-    if (!session) {
-      router.push("/teacher/login");
-      return;
-    }
-    const tchr = teachers.find(t => t.id === session);
-    if (!tchr) {
-      localStorage.removeItem("teacher_session");
-      router.push("/teacher/login");
-      return;
-    }
-    setTeacher(tchr);
-
-    // Filter students assigned to this teacher
-    const filtered = students.filter(s => 
-      s.enrollments.some(e => e.teacherId === tchr.id)
-    );
-    setAssignedStudents(filtered);
-    setLoading(false);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/teacher/login");
+        return;
+      }
+      const tchr = teachers.find(t => t.id === session.user.id);
+      if (!tchr) {
+        await supabase.auth.signOut();
+        router.push("/teacher/login");
+        return;
+      }
+      setTeacher(tchr);
+      
+      const filtered = students.filter(s => 
+        s.enrollments.some(e => e.teacherId === tchr.id)
+      );
+      setAssignedStudents(filtered);
+      setLoading(false);
+    };
+    checkAuth();
   }, [router, teachers, students]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("teacher_session");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     router.push("/teacher/login");
   };
 

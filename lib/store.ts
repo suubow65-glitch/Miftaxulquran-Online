@@ -1077,9 +1077,34 @@ export const useStore = create<CMSState>()(
       updateLibraryPageContent: (c) => set({ libraryPageContent: c }),
       updateInsightsHeader: (c) => set({ insightsHeader: c }),
       updateIjazahContent: (c) => set({ ijazahContent: c }),
-      addHeroSlide: (slide) => set((state) => ({ heroSlides: [...state.heroSlides, slide] })),
-      updateHeroSlide: (id, slide) => set((state) => ({ heroSlides: state.heroSlides.map((s) => (s.id === id ? slide : s)) })),
-      deleteHeroSlide: (id) => set((state) => ({ heroSlides: state.heroSlides.filter((s) => s.id !== id) })),
+      addHeroSlide: async (slide) => {
+        set((state) => ({ heroSlides: [...state.heroSlides, slide] }));
+        try {
+          const { error } = await supabase.from('hero_slides').insert({
+            id: slide.id, image: slide.image,
+            hadith_ar: slide.hadithAr, hadith_so: slide.hadithSo, hadith_en: slide.hadithEn,
+            sort_order: 0 // Optional, default handling
+          });
+          if (error) console.warn('HeroSlide insert:', error.message);
+        } catch (err) { console.error('HeroSlide insert failed:', err); }
+      },
+      updateHeroSlide: async (id, slide) => {
+        set((state) => ({ heroSlides: state.heroSlides.map((s) => (s.id === id ? slide : s)) }));
+        try {
+          const { error } = await supabase.from('hero_slides').update({
+            image: slide.image,
+            hadith_ar: slide.hadithAr, hadith_so: slide.hadithSo, hadith_en: slide.hadithEn,
+          }).eq('id', id);
+          if (error) console.warn('HeroSlide update:', error.message);
+        } catch (err) { console.error('HeroSlide update failed:', err); }
+      },
+      deleteHeroSlide: async (id) => {
+        set((state) => ({ heroSlides: state.heroSlides.filter((s) => s.id !== id) }));
+        try {
+          const { error } = await supabase.from('hero_slides').delete().eq('id', id);
+          if (error) console.warn('HeroSlide delete:', error.message);
+        } catch (err) { console.error('HeroSlide delete failed:', err); }
+      },
       reorderHeroSlides: (slides) => set({ heroSlides: slides }),
       updateStats: (stats) => set({ stats }),
       updateSettings: (settings) => set({ settings }),
@@ -1105,64 +1130,82 @@ export const useStore = create<CMSState>()(
 
 
       // ── TEACHERS (optimistic + Supabase sync) ────────────────
-      addTeacher: (teacher) => {
+      addTeacher: async (teacher) => {
         set(state => ({ teachers: [...state.teachers, teacher] }));
-        supabase.from('teachers').insert({
-          id: teacher.id, name: teacher.name,
-          title_so: teacher.titleSo, title_en: teacher.titleEn,
-          bio_so: teacher.bioSo, bio_en: teacher.bioEn,
-          image_url: teacher.imageUrl,
-          username: teacher.username, password: teacher.password,
-        }).then(({ error }) => { if (error) console.warn('Teacher insert:', error.message); });
+        try {
+          const { error } = await supabase.from('teachers').insert({
+            id: teacher.id, name: teacher.name,
+            title_so: teacher.titleSo, title_en: teacher.titleEn,
+            bio_so: teacher.bioSo, bio_en: teacher.bioEn,
+            image_url: teacher.imageUrl,
+            username: teacher.username, password: teacher.password,
+          });
+          if (error) console.warn('Teacher insert:', error.message);
+        } catch (err) { console.error('Teacher insert failed:', err); }
       },
-      updateTeacher: (id, teacher) => {
+      updateTeacher: async (id, teacher) => {
         set(state => ({ teachers: state.teachers.map(t => t.id === id ? teacher : t) }));
-        supabase.from('teachers').update({
-          name: teacher.name,
-          title_so: teacher.titleSo, title_en: teacher.titleEn,
-          bio_so: teacher.bioSo, bio_en: teacher.bioEn,
-          image_url: teacher.imageUrl,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Teacher update:', error.message); });
+        try {
+          const { error } = await supabase.from('teachers').update({
+            name: teacher.name,
+            title_so: teacher.titleSo, title_en: teacher.titleEn,
+            bio_so: teacher.bioSo, bio_en: teacher.bioEn,
+            image_url: teacher.imageUrl,
+          }).eq('id', id);
+          if (error) console.warn('Teacher update:', error.message);
+        } catch (err) { console.error('Teacher update failed:', err); }
       },
-      deleteTeacher: (id) => {
+      deleteTeacher: async (id) => {
         set(state => ({ teachers: state.teachers.filter(t => t.id !== id) }));
-        supabase.from('teachers').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Teacher delete:', error.message); });
+        try {
+          const { error } = await supabase.from('teachers').delete().eq('id', id);
+          if (error) console.warn('Teacher delete:', error.message);
+        } catch (err) { console.error('Teacher delete failed:', err); }
       },
-      updateTeacherCredentials: (id, username, password) => {
+      updateTeacherCredentials: async (id, username, password) => {
         set(state => ({ teachers: state.teachers.map(t => t.id === id ? { ...t, username, password } : t) }));
-        supabase.from('teachers').update({ username, password }).eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Teacher creds update:', error.message); });
+        try {
+          const { error } = await supabase.from('teachers').update({ username, password }).eq('id', id);
+          if (error) console.warn('Teacher creds update:', error.message);
+        } catch (err) { console.error('Teacher creds update failed:', err); }
       },
 
       addPost: (post) => set(state => ({ posts: [post, ...state.posts] })),
       updatePost: (id, post) => set(state => ({ posts: state.posts.map(p => p.id === id ? post : p) })),
       deletePost: (id) => set(state => ({ posts: state.posts.filter(p => p.id !== id) })),
 
-      addInsight: (insight) => {
+      addInsight: async (insight) => {
         set(state => ({ insights: [insight, ...state.insights] }));
-        supabase.from('insights').insert({
-          id: insight.id, image: insight.image,
-          category_so: insight.categorySo, category_en: insight.categoryEn,
-          title_so: insight.titleSo, title_en: insight.titleEn,
-          content_so: insight.contentSo, content_en: insight.contentEn,
-          date: insight.date,
-        }).then(({ error }) => { if (error) console.warn('Insight insert:', error.message); });
+        try {
+          const { error } = await supabase.from('insights').insert({
+            id: insight.id, image: insight.image,
+            category_so: insight.categorySo, category_en: insight.categoryEn,
+            title_so: insight.titleSo, title_en: insight.titleEn,
+            content_so: insight.contentSo, content_en: insight.contentEn,
+            date: insight.date,
+          });
+          if (error) console.warn('Insight insert:', error.message);
+        } catch (err) { console.error('Insight insert failed:', err); }
       },
-      updateInsight: (id, insight) => {
+      updateInsight: async (id, insight) => {
         set(state => ({ insights: state.insights.map(p => p.id === id ? insight : p) }));
-        supabase.from('insights').update({
-          image: insight.image,
-          category_so: insight.categorySo, category_en: insight.categoryEn,
-          title_so: insight.titleSo, title_en: insight.titleEn,
-          content_so: insight.contentSo, content_en: insight.contentEn,
-          date: insight.date,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Insight update:', error.message); });
+        try {
+          const { error } = await supabase.from('insights').update({
+            image: insight.image,
+            category_so: insight.categorySo, category_en: insight.categoryEn,
+            title_so: insight.titleSo, title_en: insight.titleEn,
+            content_so: insight.contentSo, content_en: insight.contentEn,
+            date: insight.date,
+          }).eq('id', id);
+          if (error) console.warn('Insight update:', error.message);
+        } catch (err) { console.error('Insight update failed:', err); }
       },
-      deleteInsight: (id) => {
+      deleteInsight: async (id) => {
         set(state => ({ insights: state.insights.filter(p => p.id !== id) }));
-        supabase.from('insights').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Insight delete:', error.message); });
+        try {
+          const { error } = await supabase.from('insights').delete().eq('id', id);
+          if (error) console.warn('Insight delete:', error.message);
+        } catch (err) { console.error('Insight delete failed:', err); }
       },
 
       addTrack: (track) => set(state => ({ tracks: [track, ...state.tracks] })),
@@ -1173,17 +1216,18 @@ export const useStore = create<CMSState>()(
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
       // ── STUDENTS (optimistic + Supabase sync) ────────────────
-      addStudent: (student) => {
+      addStudent: async (student) => {
         set(state => ({ students: [...state.students, student] }));
-        supabase.from('students').insert({
-          id: student.id, student_id: student.studentId,
-          name: student.name, status: student.status,
-          class_days: student.classDays, class_time: student.classTime,
-        }).then(({ error }) => {
+        try {
+          const { error } = await supabase.from('students').insert({
+            id: student.id, student_id: student.studentId,
+            name: student.name, status: student.status,
+            class_days: student.classDays, class_time: student.classTime,
+          });
           if (error) { console.warn('Student insert:', error.message); return; }
-          // persist enrollments
+          
           if (student.enrollments?.length) {
-            supabase.from('enrollments').insert(
+            const { error: ee } = await supabase.from('enrollments').insert(
               student.enrollments.map(e => ({
                 id: e.id, student_id: student.id,
                 subject_name: e.subjectName, teacher_id: e.teacherId,
@@ -1193,102 +1237,132 @@ export const useStore = create<CMSState>()(
                 current_surah: e.currentSurah, current_ayah: e.currentAyah,
                 current_lesson: e.currentLesson, current_page: e.currentPage,
               }))
-            ).then(({ error: ee }) => { if (ee) console.warn('Enroll insert:', ee.message); });
+            );
+            if (ee) console.warn('Enroll insert:', ee.message);
           }
-        });
+        } catch (err) { console.error('Student insert failed:', err); }
       },
-      updateStudent: (id, student) => {
+      updateStudent: async (id, student) => {
         set(state => ({ students: state.students.map(s => s.id === id ? student : s) }));
-        supabase.from('students').update({
-          student_id: student.studentId, name: student.name,
-          status: student.status, class_days: student.classDays, class_time: student.classTime,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Student update:', error.message); });
+        try {
+          const { error } = await supabase.from('students').update({
+            student_id: student.studentId, name: student.name,
+            status: student.status, class_days: student.classDays, class_time: student.classTime,
+          }).eq('id', id);
+          if (error) console.warn('Student update:', error.message);
+        } catch (err) { console.error('Student update failed:', err); }
       },
-      deleteStudent: (id) => {
+      deleteStudent: async (id) => {
         set(state => ({ students: state.students.filter(s => s.id !== id) }));
-        supabase.from('students').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Student delete:', error.message); });
+        try {
+          const { error } = await supabase.from('students').delete().eq('id', id);
+          if (error) console.warn('Student delete:', error.message);
+        } catch (err) { console.error('Student delete failed:', err); }
       },
 
       // ── ATTENDANCE LOGS ──────────────────────────────────────
-      addAttendanceLog: (log) => {
+      addAttendanceLog: async (log) => {
         set(state => ({ attendanceLogs: [...state.attendanceLogs, log] }));
-        supabase.from('attendance_logs').insert({
-          id: log.id, student_id: log.studentId,
-          date: log.date, subject: log.subject, subject_id: log.subjectId,
-          status: log.status,
-          juz: log.juz, hizb: log.hizb,
-          surah_started: log.surahStarted, ayah_started: log.ayahStarted,
-          surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
-          book_name: log.bookName,
-          lesson_started: log.lessonStarted, page_started: log.pageStarted,
-          lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
-          teacher_note: log.teacherNote, parent_note: log.parentNote,
-        }).then(({ error }) => { if (error) console.warn('Attendance insert:', error.message); });
+        try {
+          const { error } = await supabase.from('attendance_logs').insert({
+            id: log.id, student_id: log.studentId,
+            date: log.date, subject: log.subject, subject_id: log.subjectId,
+            status: log.status,
+            juz: log.juz, hizb: log.hizb,
+            surah_started: log.surahStarted, ayah_started: log.ayahStarted,
+            surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
+            book_name: log.bookName,
+            lesson_started: log.lessonStarted, page_started: log.pageStarted,
+            lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
+            teacher_note: log.teacherNote, parent_note: log.parentNote,
+          });
+          if (error) console.warn('Attendance insert:', error.message);
+        } catch (err) { console.error('Attendance insert failed:', err); }
       },
-      updateAttendanceLog: (id, log) => {
+      updateAttendanceLog: async (id, log) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) }));
-        supabase.from('attendance_logs').update({
-          date: log.date, subject: log.subject,
-          status: log.status, juz: log.juz, hizb: log.hizb,
-          surah_started: log.surahStarted, ayah_started: log.ayahStarted,
-          surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
-          book_name: log.bookName,
-          lesson_started: log.lessonStarted, page_started: log.pageStarted,
-          lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
-          teacher_note: log.teacherNote, parent_note: log.parentNote,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Attendance update:', error.message); });
+        try {
+          const { error } = await supabase.from('attendance_logs').update({
+            date: log.date, subject: log.subject,
+            status: log.status, juz: log.juz, hizb: log.hizb,
+            surah_started: log.surahStarted, ayah_started: log.ayahStarted,
+            surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
+            book_name: log.bookName,
+            lesson_started: log.lessonStarted, page_started: log.pageStarted,
+            lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
+            teacher_note: log.teacherNote, parent_note: log.parentNote,
+          }).eq('id', id);
+          if (error) console.warn('Attendance update:', error.message);
+        } catch (err) { console.error('Attendance update failed:', err); }
       },
-      deleteAttendanceLog: (id) => {
+      deleteAttendanceLog: async (id) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) }));
-        supabase.from('attendance_logs').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Attendance delete:', error.message); });
+        try {
+          const { error } = await supabase.from('attendance_logs').delete().eq('id', id);
+          if (error) console.warn('Attendance delete:', error.message);
+        } catch (err) { console.error('Attendance delete failed:', err); }
       },
 
       // ── PAYMENTS ────────────────────────────────────────────
-      addPayment: (payment) => {
+      addPayment: async (payment) => {
         set(state => ({ payments: [payment, ...state.payments] }));
-        supabase.from('payments').insert({
-          id: payment.id, student_id: payment.studentId,
-          month: payment.month, amount: payment.amount,
-          status: payment.status, date_paid: payment.datePaid,
-        }).then(({ error }) => { if (error) console.warn('Payment insert:', error.message); });
+        try {
+          const { error } = await supabase.from('payments').insert({
+            id: payment.id, student_id: payment.studentId,
+            month: payment.month, amount: payment.amount,
+            status: payment.status, date_paid: payment.datePaid,
+          });
+          if (error) console.warn('Payment insert:', error.message);
+        } catch (err) { console.error('Payment insert failed:', err); }
       },
-      updatePayment: (id, payment) => {
+      updatePayment: async (id, payment) => {
         set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) }));
-        supabase.from('payments').update({
-          month: payment.month, amount: payment.amount,
-          status: payment.status, date_paid: payment.datePaid,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Payment update:', error.message); });
+        try {
+          const { error } = await supabase.from('payments').update({
+            month: payment.month, amount: payment.amount,
+            status: payment.status, date_paid: payment.datePaid,
+          }).eq('id', id);
+          if (error) console.warn('Payment update:', error.message);
+        } catch (err) { console.error('Payment update failed:', err); }
       },
-      deletePayment: (id) => {
+      deletePayment: async (id) => {
         set(state => ({ payments: state.payments.filter(p => p.id !== id) }));
-        supabase.from('payments').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Payment delete:', error.message); });
+        try {
+          const { error } = await supabase.from('payments').delete().eq('id', id);
+          if (error) console.warn('Payment delete:', error.message);
+        } catch (err) { console.error('Payment delete failed:', err); }
       },
 
       // ── EXAMS ───────────────────────────────────────────────
-      addExam: (exam) => {
+      addExam: async (exam) => {
         set(state => ({ exams: [exam, ...state.exams] }));
-        supabase.from('exams').insert({
-          id: exam.id, student_id: exam.studentId,
-          subject: exam.subject, teacher_id: exam.teacherId,
-          score: exam.score, grade: exam.grade,
-          term: exam.term, date: exam.date,
-        }).then(({ error }) => { if (error) console.warn('Exam insert:', error.message); });
+        try {
+          const { error } = await supabase.from('exams').insert({
+            id: exam.id, student_id: exam.studentId,
+            subject: exam.subject, teacher_id: exam.teacherId,
+            score: exam.score, grade: exam.grade,
+            term: exam.term, date: exam.date,
+          });
+          if (error) console.warn('Exam insert:', error.message);
+        } catch (err) { console.error('Exam insert failed:', err); }
       },
-      updateExam: (id, exam) => {
+      updateExam: async (id, exam) => {
         set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) }));
-        supabase.from('exams').update({
-          subject: exam.subject, teacher_id: exam.teacherId,
-          score: exam.score, grade: exam.grade,
-          term: exam.term, date: exam.date,
-        }).eq('id', id).then(({ error }) => { if (error) console.warn('Exam update:', error.message); });
+        try {
+          const { error } = await supabase.from('exams').update({
+            subject: exam.subject, teacher_id: exam.teacherId,
+            score: exam.score, grade: exam.grade,
+            term: exam.term, date: exam.date,
+          }).eq('id', id);
+          if (error) console.warn('Exam update:', error.message);
+        } catch (err) { console.error('Exam update failed:', err); }
       },
-      deleteExam: (id) => {
+      deleteExam: async (id) => {
         set(state => ({ exams: state.exams.filter(e => e.id !== id) }));
-        supabase.from('exams').delete().eq('id', id)
-          .then(({ error }) => { if (error) console.warn('Exam delete:', error.message); });
+        try {
+          const { error } = await supabase.from('exams').delete().eq('id', id);
+          if (error) console.warn('Exam delete:', error.message);
+        } catch (err) { console.error('Exam delete failed:', err); }
       },
 
       // ── BOOTSTRAP: load live data from Supabase on app start ──
