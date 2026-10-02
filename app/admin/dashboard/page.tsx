@@ -2703,7 +2703,7 @@ function QuranPlayerModule() {
               <input value={form.audioDataUrl} onChange={e => setForm(f => ({ ...f, audioDataUrl: e.target.value }))}
                 placeholder="https://server8.mp3quran.net/.../001.mp3"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
-              <p className="text-[10px] text-gray-500 mt-1">Paste a direct MP3 link from Quran hosting sites.</p>
+              <p className="text-[10px] text-red-500 font-bold mt-1">Fadlan hubi in link-gu ku dhammaado .mp3 uuna yahay mid si toos ah loo maqli karo.</p>
             </div>
           </div>
           

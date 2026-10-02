@@ -71,12 +71,14 @@ function HeroSection() {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
+  const [showAudioError, setShowAudioError] = useState(false);
   const activeTracks = tracks.filter(t => t.isActive);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const currentTrack = activeTracks[currentTrackIndex];
-  const currentTrackUrl = currentTrack?.audioDataUrl || "https://server8.mp3quran.net/afs/001.mp3";
-  const currentTrackName = currentTrack?.title || "Al-Fatiha";
-  const currentReciterName = currentTrack?.reciter || "Mishary Al-Afasy";
+  const currentTrackUrl = fallbackUrl || currentTrack?.audioDataUrl || "https://server8.mp3quran.net/afs/001.mp3";
+  const currentTrackName = fallbackUrl ? "Al-Fatiha" : (currentTrack?.title || "Al-Fatiha");
+  const currentReciterName = fallbackUrl ? "Mishary Al-Afasy" : (currentTrack?.reciter || "Mishary Al-Afasy");
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -276,10 +278,30 @@ function HeroSection() {
                   ref={audioRef} 
                   src={currentTrackUrl} 
                   onEnded={handleTrackEnd} 
-                  onError={(e) => console.error("Audio playback error:", e)}
+                  onError={(e) => {
+                    console.error("Audio playback error:", e);
+                    setFallbackUrl("https://server8.mp3quran.net/afs/001.mp3");
+                    setShowAudioError(true);
+                    setTimeout(() => setShowAudioError(false), 6000);
+                  }}
                   playsInline 
                 />
               )}
+
+              {/* Toast Error Message */}
+              <AnimatePresence>
+                {showAudioError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="absolute top-4 left-4 right-4 z-50 bg-red-500/90 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 backdrop-blur-md"
+                  >
+                    <VolumeX className="h-5 w-5 flex-shrink-0" />
+                    <span>Link-ga codka ee aad gelisay ma shaqaynayo, waxaa loo laabtay kii hore.</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* ── Slide Images (absolute, fade transition) ── */}
               {slides?.map((slide, idx) => (
