@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,12 +29,12 @@ export default function AdminLoginPage() {
 
     try {
       const auth = getFirebaseAuth();
-      await signInWithEmailAndPassword(auth, username, password);
+      await signInWithEmailAndPassword(auth, email, password);
       document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
       router.push("/admin/dashboard");
       router.refresh();
-    } catch (err) {
-      setError("Invalid credentials. Please check your email and password.");
+    } catch (err: any) {
+      setError(err.code === 'auth/invalid-credential' ? 'Email ama Password khaldan' : err.message);
     } finally {
       setLoading(false);
     }
@@ -59,15 +59,15 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-5 relative z-10">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Username</label>
+            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">EMAIL ADDRESS</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
-                type="text"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@miftaxulquran.com"
                 className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               />
             </div>
