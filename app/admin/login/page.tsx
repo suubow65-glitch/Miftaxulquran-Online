@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, User, Loader2, LogIn } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { supabase } from "@/lib/supabase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -27,20 +28,13 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: username,
-        password: password,
-      });
-
-      if (signInError) {
-        setError("Invalid credentials. Please check your email and password.");
-      } else {
-        document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
-        router.push("/admin/dashboard");
-        router.refresh();
-      }
+      const auth = getFirebaseAuth();
+      await signInWithEmailAndPassword(auth, username, password);
+      document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
+      router.push("/admin/dashboard");
+      router.refresh();
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError("Invalid credentials. Please check your email and password.");
     } finally {
       setLoading(false);
     }

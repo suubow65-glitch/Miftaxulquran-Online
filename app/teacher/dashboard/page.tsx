@@ -6,7 +6,8 @@ import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut, BookOpen, Clock, Check, Save, X, Settings, User, AlertCircle, FileText, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { signOut } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function TeacherDashboard() {
   const router = useRouter();
@@ -32,20 +33,27 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      // Check Firebase Auth session stored in localStorage
+      const auth = getFirebaseAuth();
+      const currentUser = auth.currentUser;
+      const sessionUid = localStorage.getItem("teacher_session");
+
+      if (!currentUser && !sessionUid) {
         router.push("/teacher/login");
         return;
       }
-      const tchr = teachers.find(t => t.id === session.user.id);
+
+      const uid = currentUser?.uid ?? sessionUid;
+      // Try to match by Firebase UID first, then fall back to username/email match
+      const tchr = teachers.find(t => t.id === uid) ?? teachers.find(t => t.username === uid);
       if (!tchr) {
-        await supabase.auth.signOut();
+        localStorage.removeItem("teacher_session");
         router.push("/teacher/login");
         return;
       }
       setTeacher(tchr);
-      
-      const filtered = students.filter(s => 
+
+      const filtered = students.filter(s =>
         s.enrollments.some(e => e.teacherId === tchr.id)
       );
       setAssignedStudents(filtered);
@@ -55,7 +63,11 @@ export default function TeacherDashboard() {
   }, [router, teachers, students]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      const auth = getFirebaseAuth();
+      await signOut(auth);
+    } catch (_) { /* ignore */ }
+    localStorage.removeItem("teacher_session");
     router.push("/teacher/login");
   };
 

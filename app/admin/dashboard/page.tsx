@@ -347,28 +347,25 @@ function ExamsModule() {
 }
 
 /* ═══════════════════════ MAIN DASHBOARD ═══════════════════════ */
-import { supabase } from "@/lib/supabase";
+import { signOut } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function AdminDashboard() {
   const [module, setModule] = useState<Module>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/admin/login");
-      }
-    };
-    checkAuth();
-  }, [router]);
+  // Firebase Auth session is validated via cookie set at login.
+  // Cookie-based protection is handled by middleware.ts.
 
-  const initializeSupabase = useStore((s) => s.initializeSupabase);
-  useEffect(() => { initializeSupabase(); }, [initializeSupabase]);
+  const initializeFirestore = useStore((s) => s.initializeFirestore);
+  useEffect(() => { initializeFirestore(); }, [initializeFirestore]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      const auth = getFirebaseAuth();
+      await signOut(auth);
+    } catch (_) { /* ignore */ }
     document.cookie = "miftaxul_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/admin/login");
   };

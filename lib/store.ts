@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from './supabase';
+import { getFirebaseDb } from './firebase';
+import {
+  collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
+  query, orderBy, where, writeBatch, Timestamp
+} from 'firebase/firestore';
 
 export type Category = "quran" | "tajweed" | "arabic" | "islamic" | "seerah" | "all";
 
@@ -540,6 +544,8 @@ interface CMSState {
   updateExam: (id: string, exam: Exam) => void;
   deleteExam: (id: string) => void;
   // ── Bootstrap ──────────────────────────────────────────
+  initializeFirestore: () => Promise<void>;
+  /** @deprecated Use initializeFirestore instead */
   initializeSupabase: () => Promise<void>;
 }
 
@@ -547,21 +553,21 @@ export const initialHeroSlides: HeroSlide[] = [
   {
     id: "slide-1",
     image: "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&q=80&w=900",
-    hadithAr: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+    hadithAr: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
     hadithSo: "Kii idiinku khayr badan waa kan barta Qur'aanka ee dadka bara.",
     hadithEn: "The best among you are those who learn the Quran and teach it.",
   },
   {
     id: "slide-2",
     image: "https://images.unsplash.com/photo-1608155686393-8fdd966d784d?auto=format&fit=crop&q=80&w=900",
-    hadithAr: "اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ",
+    hadithAr: "اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ",
     hadithSo: "Akhriya Qur'aanka, wuxuu iman maalinta qiyaame isagoo u shafeecaya ciddii akhrin jirtay.",
     hadithEn: "Read the Quran, for it will come as an intercessor for its reciters on the Day of Resurrection.",
   },
   {
     id: "slide-3",
     image: "https://images.unsplash.com/photo-1596720426673-e4e14220b3df?auto=format&fit=crop&q=80&w=900",
-    hadithAr: "مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ",
+    hadithAr: "مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ",
     hadithSo: "Qofkii akhriya xaraf ka mid ah kitaabka Ilaahay wuxuu leeyahay hal xasanad.",
     hadithEn: "Whoever recites a letter from the Book of Allah, he will be credited with a good deed.",
   },
@@ -839,7 +845,7 @@ export const initialBottomCTA: BottomCTAContent = {
   badgeEn: "Start Your Journey Today",
   titleSo: "Diyaar u tahay inaad furto Buugta Ilaahow?",
   titleEn: "Ready to unlock the Book of Allah?",
-  descriptionSo: "Ku biir arday 2,000+ ah oo Miftaxul Quran Online ku baraya Qur'aanka. Casharkii ugu horreeyay bilaash — ballan-quul ma jirto.",
+  descriptionSo: "Ku biir arday 2,000+ ah oo Miftaxul Quran Online ku baraya Qur'aanka. Casharkii ugu horreeyad bilaash — ballan-quul ma jirto.",
   descriptionEn: "Join 2,000+ students learning the Quran with Miftaxul Quran Online. First lesson is free — no commitment required.",
   primaryButtonTextSo: "Is-diiwaangeli — Bilaash",
   primaryButtonTextEn: "Register — Free Trial",
@@ -1025,6 +1031,15 @@ export const initialInsights: Insight[] = [
 export const initialStudents: Student[] = [];
 export const initialAttendanceLogs: AttendanceLog[] = [];
 
+// ─────── Firestore helpers ────────────────────────────────────────────────────
+
+/** Strip undefined fields (Firestore rejects them) */
+function clean<T extends Record<string, unknown>>(obj: T): T {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined)
+  ) as T;
+}
+
 export const useStore = create<CMSState>()(
   persist(
     (set) => ({
@@ -1077,32 +1092,38 @@ export const useStore = create<CMSState>()(
       updateLibraryPageContent: (c) => set({ libraryPageContent: c }),
       updateInsightsHeader: (c) => set({ insightsHeader: c }),
       updateIjazahContent: (c) => set({ ijazahContent: c }),
+
+      // ── HERO SLIDES ──────────────────────────────────────────
       addHeroSlide: async (slide) => {
         set((state) => ({ heroSlides: [...state.heroSlides, slide] }));
         try {
-          const { error } = await supabase.from('hero_slides').insert({
-            id: slide.id, image: slide.image,
-            hadith_ar: slide.hadithAr, hadith_so: slide.hadithSo, hadith_en: slide.hadithEn,
-            sort_order: 0 // Optional, default handling
-          });
-          if (error) console.warn('HeroSlide insert:', error.message);
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'hero_slides', slide.id), clean({
+            image: slide.image,
+            hadithAr: slide.hadithAr,
+            hadithSo: slide.hadithSo,
+            hadithEn: slide.hadithEn,
+            sortOrder: Date.now(),
+          }));
         } catch (err) { console.error('HeroSlide insert failed:', err); }
       },
       updateHeroSlide: async (id, slide) => {
         set((state) => ({ heroSlides: state.heroSlides.map((s) => (s.id === id ? slide : s)) }));
         try {
-          const { error } = await supabase.from('hero_slides').update({
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'hero_slides', id), clean({
             image: slide.image,
-            hadith_ar: slide.hadithAr, hadith_so: slide.hadithSo, hadith_en: slide.hadithEn,
-          }).eq('id', id);
-          if (error) console.warn('HeroSlide update:', error.message);
+            hadithAr: slide.hadithAr,
+            hadithSo: slide.hadithSo,
+            hadithEn: slide.hadithEn,
+          }));
         } catch (err) { console.error('HeroSlide update failed:', err); }
       },
       deleteHeroSlide: async (id) => {
         set((state) => ({ heroSlides: state.heroSlides.filter((s) => s.id !== id) }));
         try {
-          const { error } = await supabase.from('hero_slides').delete().eq('id', id);
-          if (error) console.warn('HeroSlide delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'hero_slides', id));
         } catch (err) { console.error('HeroSlide delete failed:', err); }
       },
       reorderHeroSlides: (slides) => set({ heroSlides: slides }),
@@ -1128,45 +1149,49 @@ export const useStore = create<CMSState>()(
       updateLeadStatus: (id, status) => set(state => ({ leads: state.leads.map(l => l.id === id ? { ...l, status } : l) })),
       deleteLead: (id) => set(state => ({ leads: state.leads.filter(l => l.id !== id) })),
 
-
-      // ── TEACHERS (optimistic + Supabase sync) ────────────────
+      // ── TEACHERS (optimistic + Firestore sync) ────────────────
       addTeacher: async (teacher) => {
         set(state => ({ teachers: [...state.teachers, teacher] }));
         try {
-          const { error } = await supabase.from('teachers').insert({
-            id: teacher.id, name: teacher.name,
-            title_so: teacher.titleSo, title_en: teacher.titleEn,
-            bio_so: teacher.bioSo, bio_en: teacher.bioEn,
-            image_url: teacher.imageUrl,
-            username: teacher.username, password: teacher.password,
-          });
-          if (error) console.warn('Teacher insert:', error.message);
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'teachers', teacher.id), clean({
+            name: teacher.name,
+            titleSo: teacher.titleSo,
+            titleEn: teacher.titleEn,
+            bioSo: teacher.bioSo,
+            bioEn: teacher.bioEn,
+            imageUrl: teacher.imageUrl,
+            username: teacher.username,
+            password: teacher.password,
+          }));
         } catch (err) { console.error('Teacher insert failed:', err); }
       },
       updateTeacher: async (id, teacher) => {
         set(state => ({ teachers: state.teachers.map(t => t.id === id ? teacher : t) }));
         try {
-          const { error } = await supabase.from('teachers').update({
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'teachers', id), clean({
             name: teacher.name,
-            title_so: teacher.titleSo, title_en: teacher.titleEn,
-            bio_so: teacher.bioSo, bio_en: teacher.bioEn,
-            image_url: teacher.imageUrl,
-          }).eq('id', id);
-          if (error) console.warn('Teacher update:', error.message);
+            titleSo: teacher.titleSo,
+            titleEn: teacher.titleEn,
+            bioSo: teacher.bioSo,
+            bioEn: teacher.bioEn,
+            imageUrl: teacher.imageUrl,
+          }));
         } catch (err) { console.error('Teacher update failed:', err); }
       },
       deleteTeacher: async (id) => {
         set(state => ({ teachers: state.teachers.filter(t => t.id !== id) }));
         try {
-          const { error } = await supabase.from('teachers').delete().eq('id', id);
-          if (error) console.warn('Teacher delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'teachers', id));
         } catch (err) { console.error('Teacher delete failed:', err); }
       },
       updateTeacherCredentials: async (id, username, password) => {
         set(state => ({ teachers: state.teachers.map(t => t.id === id ? { ...t, username, password } : t) }));
         try {
-          const { error } = await supabase.from('teachers').update({ username, password }).eq('id', id);
-          if (error) console.warn('Teacher creds update:', error.message);
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'teachers', id), { username, password });
         } catch (err) { console.error('Teacher creds update failed:', err); }
       },
 
@@ -1174,37 +1199,44 @@ export const useStore = create<CMSState>()(
       updatePost: (id, post) => set(state => ({ posts: state.posts.map(p => p.id === id ? post : p) })),
       deletePost: (id) => set(state => ({ posts: state.posts.filter(p => p.id !== id) })),
 
+      // ── INSIGHTS (optimistic + Firestore sync) ────────────────
       addInsight: async (insight) => {
         set(state => ({ insights: [insight, ...state.insights] }));
         try {
-          const { error } = await supabase.from('insights').insert({
-            id: insight.id, image: insight.image,
-            category_so: insight.categorySo, category_en: insight.categoryEn,
-            title_so: insight.titleSo, title_en: insight.titleEn,
-            content_so: insight.contentSo, content_en: insight.contentEn,
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'insights', insight.id), clean({
+            image: insight.image,
+            categorySo: insight.categorySo,
+            categoryEn: insight.categoryEn,
+            titleSo: insight.titleSo,
+            titleEn: insight.titleEn,
+            contentSo: insight.contentSo,
+            contentEn: insight.contentEn,
             date: insight.date,
-          });
-          if (error) console.warn('Insight insert:', error.message);
+          }));
         } catch (err) { console.error('Insight insert failed:', err); }
       },
       updateInsight: async (id, insight) => {
         set(state => ({ insights: state.insights.map(p => p.id === id ? insight : p) }));
         try {
-          const { error } = await supabase.from('insights').update({
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'insights', id), clean({
             image: insight.image,
-            category_so: insight.categorySo, category_en: insight.categoryEn,
-            title_so: insight.titleSo, title_en: insight.titleEn,
-            content_so: insight.contentSo, content_en: insight.contentEn,
+            categorySo: insight.categorySo,
+            categoryEn: insight.categoryEn,
+            titleSo: insight.titleSo,
+            titleEn: insight.titleEn,
+            contentSo: insight.contentSo,
+            contentEn: insight.contentEn,
             date: insight.date,
-          }).eq('id', id);
-          if (error) console.warn('Insight update:', error.message);
+          }));
         } catch (err) { console.error('Insight update failed:', err); }
       },
       deleteInsight: async (id) => {
         set(state => ({ insights: state.insights.filter(p => p.id !== id) }));
         try {
-          const { error } = await supabase.from('insights').delete().eq('id', id);
-          if (error) console.warn('Insight delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'insights', id));
         } catch (err) { console.error('Insight delete failed:', err); }
       },
 
@@ -1215,48 +1247,59 @@ export const useStore = create<CMSState>()(
       })),
       setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
-      // ── STUDENTS (optimistic + Supabase sync) ────────────────
+      // ── STUDENTS (optimistic + Firestore sync) ────────────────
       addStudent: async (student) => {
         set(state => ({ students: [...state.students, student] }));
         try {
-          const { error } = await supabase.from('students').insert({
-            id: student.id, student_id: student.studentId,
-            name: student.name, status: student.status,
-            class_days: student.classDays, class_time: student.classTime,
-          });
-          if (error) { console.warn('Student insert:', error.message); return; }
-          
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'students', student.id), clean({
+            studentId: student.studentId,
+            name: student.name,
+            status: student.status,
+            classDays: student.classDays,
+            classTime: student.classTime,
+          }));
+
           if (student.enrollments?.length) {
-            const { error: ee } = await supabase.from('enrollments').insert(
-              student.enrollments.map(e => ({
-                id: e.id, student_id: student.id,
-                subject_name: e.subjectName, teacher_id: e.teacherId,
-                level: e.level, status: e.status,
-                total_lessons: e.totalLessons,
-                current_juz: e.currentJuz, current_hizb: e.currentHizb,
-                current_surah: e.currentSurah, current_ayah: e.currentAyah,
-                current_lesson: e.currentLesson, current_page: e.currentPage,
-              }))
-            );
-            if (ee) console.warn('Enroll insert:', ee.message);
+            const batch = writeBatch(db);
+            for (const e of student.enrollments) {
+              batch.set(doc(db, 'enrollments', e.id), clean({
+                studentId: student.id,
+                subjectName: e.subjectName,
+                teacherId: e.teacherId,
+                level: e.level,
+                status: e.status,
+                totalLessons: e.totalLessons,
+                currentJuz: e.currentJuz,
+                currentHizb: e.currentHizb,
+                currentSurah: e.currentSurah,
+                currentAyah: e.currentAyah,
+                currentLesson: e.currentLesson,
+                currentPage: e.currentPage,
+              }));
+            }
+            await batch.commit();
           }
         } catch (err) { console.error('Student insert failed:', err); }
       },
       updateStudent: async (id, student) => {
         set(state => ({ students: state.students.map(s => s.id === id ? student : s) }));
         try {
-          const { error } = await supabase.from('students').update({
-            student_id: student.studentId, name: student.name,
-            status: student.status, class_days: student.classDays, class_time: student.classTime,
-          }).eq('id', id);
-          if (error) console.warn('Student update:', error.message);
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'students', id), clean({
+            studentId: student.studentId,
+            name: student.name,
+            status: student.status,
+            classDays: student.classDays,
+            classTime: student.classTime,
+          }));
         } catch (err) { console.error('Student update failed:', err); }
       },
       deleteStudent: async (id) => {
         set(state => ({ students: state.students.filter(s => s.id !== id) }));
         try {
-          const { error } = await supabase.from('students').delete().eq('id', id);
-          if (error) console.warn('Student delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'students', id));
         } catch (err) { console.error('Student delete failed:', err); }
       },
 
@@ -1264,42 +1307,58 @@ export const useStore = create<CMSState>()(
       addAttendanceLog: async (log) => {
         set(state => ({ attendanceLogs: [...state.attendanceLogs, log] }));
         try {
-          const { error } = await supabase.from('attendance_logs').insert({
-            id: log.id, student_id: log.studentId,
-            date: log.date, subject: log.subject, subject_id: log.subjectId,
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'attendance_logs', log.id), clean({
+            studentId: log.studentId,
+            date: log.date,
+            subject: log.subject,
+            subjectId: log.subjectId,
             status: log.status,
-            juz: log.juz, hizb: log.hizb,
-            surah_started: log.surahStarted, ayah_started: log.ayahStarted,
-            surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
-            book_name: log.bookName,
-            lesson_started: log.lessonStarted, page_started: log.pageStarted,
-            lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
-            teacher_note: log.teacherNote, parent_note: log.parentNote,
-          });
-          if (error) console.warn('Attendance insert:', error.message);
+            juz: log.juz,
+            hizb: log.hizb,
+            surahStarted: log.surahStarted,
+            ayahStarted: log.ayahStarted,
+            surahEnded: log.surahEnded,
+            ayahEnded: log.ayahEnded,
+            bookName: log.bookName,
+            lessonStarted: log.lessonStarted,
+            pageStarted: log.pageStarted,
+            lessonEnded: log.lessonEnded,
+            pageEnded: log.pageEnded,
+            teacherNote: log.teacherNote,
+            parentNote: log.parentNote,
+          }));
         } catch (err) { console.error('Attendance insert failed:', err); }
       },
       updateAttendanceLog: async (id, log) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.map(l => l.id === id ? log : l) }));
         try {
-          const { error } = await supabase.from('attendance_logs').update({
-            date: log.date, subject: log.subject,
-            status: log.status, juz: log.juz, hizb: log.hizb,
-            surah_started: log.surahStarted, ayah_started: log.ayahStarted,
-            surah_ended: log.surahEnded, ayah_ended: log.ayahEnded,
-            book_name: log.bookName,
-            lesson_started: log.lessonStarted, page_started: log.pageStarted,
-            lesson_ended: log.lessonEnded, page_ended: log.pageEnded,
-            teacher_note: log.teacherNote, parent_note: log.parentNote,
-          }).eq('id', id);
-          if (error) console.warn('Attendance update:', error.message);
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'attendance_logs', id), clean({
+            date: log.date,
+            subject: log.subject,
+            status: log.status,
+            juz: log.juz,
+            hizb: log.hizb,
+            surahStarted: log.surahStarted,
+            ayahStarted: log.ayahStarted,
+            surahEnded: log.surahEnded,
+            ayahEnded: log.ayahEnded,
+            bookName: log.bookName,
+            lessonStarted: log.lessonStarted,
+            pageStarted: log.pageStarted,
+            lessonEnded: log.lessonEnded,
+            pageEnded: log.pageEnded,
+            teacherNote: log.teacherNote,
+            parentNote: log.parentNote,
+          }));
         } catch (err) { console.error('Attendance update failed:', err); }
       },
       deleteAttendanceLog: async (id) => {
         set(state => ({ attendanceLogs: state.attendanceLogs.filter(l => l.id !== id) }));
         try {
-          const { error } = await supabase.from('attendance_logs').delete().eq('id', id);
-          if (error) console.warn('Attendance delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'attendance_logs', id));
         } catch (err) { console.error('Attendance delete failed:', err); }
       },
 
@@ -1307,29 +1366,33 @@ export const useStore = create<CMSState>()(
       addPayment: async (payment) => {
         set(state => ({ payments: [payment, ...state.payments] }));
         try {
-          const { error } = await supabase.from('payments').insert({
-            id: payment.id, student_id: payment.studentId,
-            month: payment.month, amount: payment.amount,
-            status: payment.status, date_paid: payment.datePaid,
-          });
-          if (error) console.warn('Payment insert:', error.message);
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'payments', payment.id), clean({
+            studentId: payment.studentId,
+            month: payment.month,
+            amount: payment.amount,
+            status: payment.status,
+            datePaid: payment.datePaid,
+          }));
         } catch (err) { console.error('Payment insert failed:', err); }
       },
       updatePayment: async (id, payment) => {
         set(state => ({ payments: state.payments.map(p => p.id === id ? payment : p) }));
         try {
-          const { error } = await supabase.from('payments').update({
-            month: payment.month, amount: payment.amount,
-            status: payment.status, date_paid: payment.datePaid,
-          }).eq('id', id);
-          if (error) console.warn('Payment update:', error.message);
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'payments', id), clean({
+            month: payment.month,
+            amount: payment.amount,
+            status: payment.status,
+            datePaid: payment.datePaid,
+          }));
         } catch (err) { console.error('Payment update failed:', err); }
       },
       deletePayment: async (id) => {
         set(state => ({ payments: state.payments.filter(p => p.id !== id) }));
         try {
-          const { error } = await supabase.from('payments').delete().eq('id', id);
-          if (error) console.warn('Payment delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'payments', id));
         } catch (err) { console.error('Payment delete failed:', err); }
       },
 
@@ -1337,141 +1400,212 @@ export const useStore = create<CMSState>()(
       addExam: async (exam) => {
         set(state => ({ exams: [exam, ...state.exams] }));
         try {
-          const { error } = await supabase.from('exams').insert({
-            id: exam.id, student_id: exam.studentId,
-            subject: exam.subject, teacher_id: exam.teacherId,
-            score: exam.score, grade: exam.grade,
-            term: exam.term, date: exam.date,
-          });
-          if (error) console.warn('Exam insert:', error.message);
+          const db = getFirebaseDb();
+          await setDoc(doc(db, 'exams', exam.id), clean({
+            studentId: exam.studentId,
+            subject: exam.subject,
+            teacherId: exam.teacherId,
+            score: exam.score,
+            grade: exam.grade,
+            term: exam.term,
+            date: exam.date,
+          }));
         } catch (err) { console.error('Exam insert failed:', err); }
       },
       updateExam: async (id, exam) => {
         set(state => ({ exams: state.exams.map(e => e.id === id ? exam : e) }));
         try {
-          const { error } = await supabase.from('exams').update({
-            subject: exam.subject, teacher_id: exam.teacherId,
-            score: exam.score, grade: exam.grade,
-            term: exam.term, date: exam.date,
-          }).eq('id', id);
-          if (error) console.warn('Exam update:', error.message);
+          const db = getFirebaseDb();
+          await updateDoc(doc(db, 'exams', id), clean({
+            subject: exam.subject,
+            teacherId: exam.teacherId,
+            score: exam.score,
+            grade: exam.grade,
+            term: exam.term,
+            date: exam.date,
+          }));
         } catch (err) { console.error('Exam update failed:', err); }
       },
       deleteExam: async (id) => {
         set(state => ({ exams: state.exams.filter(e => e.id !== id) }));
         try {
-          const { error } = await supabase.from('exams').delete().eq('id', id);
-          if (error) console.warn('Exam delete:', error.message);
+          const db = getFirebaseDb();
+          await deleteDoc(doc(db, 'exams', id));
         } catch (err) { console.error('Exam delete failed:', err); }
       },
 
-      // ── BOOTSTRAP: load live data from Supabase on app start ──
-      initializeSupabase: async () => {
+      // ── BOOTSTRAP: load live data from Firestore on app start ──
+      initializeFirestore: async () => {
         try {
-          const [studentsRes, teachersRes, attendanceRes, paymentsRes, examsRes,
-                 enrollmentsRes, heroSlidesRes, insightsRes] = await Promise.all([
-            supabase.from('students').select('*'),
-            supabase.from('teachers').select('*'),
-            supabase.from('attendance_logs').select('*'),
-            supabase.from('payments').select('*'),
-            supabase.from('exams').select('*'),
-            supabase.from('enrollments').select('*'),
-            supabase.from('hero_slides').select('*').order('sort_order'),
-            supabase.from('insights').select('*').order('date', { ascending: false }),
+          const db = getFirebaseDb();
+
+          const [studentsSnap, teachersSnap, attendanceSnap, paymentsSnap,
+                 examsSnap, enrollmentsSnap, heroSlidesSnap, insightsSnap] = await Promise.all([
+            getDocs(collection(db, 'students')),
+            getDocs(collection(db, 'teachers')),
+            getDocs(collection(db, 'attendance_logs')),
+            getDocs(collection(db, 'payments')),
+            getDocs(collection(db, 'exams')),
+            getDocs(collection(db, 'enrollments')),
+            getDocs(query(collection(db, 'hero_slides'), orderBy('sortOrder'))),
+            getDocs(query(collection(db, 'insights'), orderBy('date', 'desc'))),
           ]);
 
-          // Map DB snake_case → TS camelCase
-          if (studentsRes.data && studentsRes.data.length > 0) {
-            const enrollments: any[] = enrollmentsRes.data ?? [];
-            const mapped = studentsRes.data.map((s: any) => ({
-              id: s.id, studentId: s.student_id, name: s.name,
-              status: s.status, classDays: s.class_days, classTime: s.class_time,
-              enrollments: enrollments
-                .filter((e: any) => e.student_id === s.id)
-                .map((e: any) => ({
-                  id: e.id, subjectName: e.subject_name, teacherId: e.teacher_id,
-                  level: e.level, status: e.status, totalLessons: e.total_lessons,
-                  currentJuz: e.current_juz, currentHizb: e.current_hizb,
-                  currentSurah: e.current_surah, currentAyah: e.current_ayah,
-                  currentLesson: e.current_lesson, currentPage: e.current_page,
-                })),
-            }));
+          if (!studentsSnap.empty) {
+            const enrollments = enrollmentsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+            const mapped = studentsSnap.docs.map(d => {
+              const s = d.data() as any;
+              return {
+                id: d.id,
+                studentId: s.studentId,
+                name: s.name,
+                status: s.status,
+                classDays: s.classDays,
+                classTime: s.classTime,
+                enrollments: enrollments
+                  .filter(e => e.studentId === d.id)
+                  .map(e => ({
+                    id: e.id,
+                    subjectName: e.subjectName,
+                    teacherId: e.teacherId,
+                    level: e.level,
+                    status: e.status,
+                    totalLessons: e.totalLessons,
+                    currentJuz: e.currentJuz,
+                    currentHizb: e.currentHizb,
+                    currentSurah: e.currentSurah,
+                    currentAyah: e.currentAyah,
+                    currentLesson: e.currentLesson,
+                    currentPage: e.currentPage,
+                  })),
+              };
+            });
             set({ students: mapped });
           }
 
-          if (teachersRes.data && teachersRes.data.length > 0) {
+          if (!teachersSnap.empty) {
             set({
-              teachers: teachersRes.data.map((t: any) => ({
-                id: t.id, name: t.name,
-                titleSo: t.title_so, titleEn: t.title_en,
-                bioSo: t.bio_so, bioEn: t.bio_en,
-                imageUrl: t.image_url,
-                username: t.username, password: t.password,
-              }))
+              teachers: teachersSnap.docs.map(d => {
+                const t = d.data() as any;
+                return {
+                  id: d.id,
+                  name: t.name,
+                  titleSo: t.titleSo,
+                  titleEn: t.titleEn,
+                  bioSo: t.bioSo,
+                  bioEn: t.bioEn,
+                  imageUrl: t.imageUrl,
+                  username: t.username,
+                  password: t.password,
+                };
+              })
             });
           }
 
-          if (attendanceRes.data && attendanceRes.data.length > 0) {
+          if (!attendanceSnap.empty) {
             set({
-              attendanceLogs: attendanceRes.data.map((l: any) => ({
-                id: l.id, studentId: l.student_id,
-                date: l.date, subject: l.subject, subjectId: l.subject_id,
-                status: l.status,
-                juz: l.juz, hizb: l.hizb,
-                surahStarted: l.surah_started, ayahStarted: l.ayah_started,
-                surahEnded: l.surah_ended, ayahEnded: l.ayah_ended,
-                bookName: l.book_name,
-                lessonStarted: l.lesson_started, pageStarted: l.page_started,
-                lessonEnded: l.lesson_ended, pageEnded: l.page_ended,
-                teacherNote: l.teacher_note, parentNote: l.parent_note,
-              }))
+              attendanceLogs: attendanceSnap.docs.map(d => {
+                const l = d.data() as any;
+                return {
+                  id: d.id,
+                  studentId: l.studentId,
+                  date: l.date,
+                  subject: l.subject,
+                  subjectId: l.subjectId,
+                  status: l.status,
+                  juz: l.juz,
+                  hizb: l.hizb,
+                  surahStarted: l.surahStarted,
+                  ayahStarted: l.ayahStarted,
+                  surahEnded: l.surahEnded,
+                  ayahEnded: l.ayahEnded,
+                  bookName: l.bookName,
+                  lessonStarted: l.lessonStarted,
+                  pageStarted: l.pageStarted,
+                  lessonEnded: l.lessonEnded,
+                  pageEnded: l.pageEnded,
+                  teacherNote: l.teacherNote,
+                  parentNote: l.parentNote,
+                };
+              })
             });
           }
 
-          if (paymentsRes.data && paymentsRes.data.length > 0) {
+          if (!paymentsSnap.empty) {
             set({
-              payments: paymentsRes.data.map((p: any) => ({
-                id: p.id, studentId: p.student_id,
-                month: p.month, amount: p.amount,
-                status: p.status, datePaid: p.date_paid,
-              }))
+              payments: paymentsSnap.docs.map(d => {
+                const p = d.data() as any;
+                return {
+                  id: d.id,
+                  studentId: p.studentId,
+                  month: p.month,
+                  amount: p.amount,
+                  status: p.status,
+                  datePaid: p.datePaid,
+                };
+              })
             });
           }
 
-          if (examsRes.data && examsRes.data.length > 0) {
+          if (!examsSnap.empty) {
             set({
-              exams: examsRes.data.map((e: any) => ({
-                id: e.id, studentId: e.student_id,
-                subject: e.subject, teacherId: e.teacher_id,
-                score: e.score, grade: e.grade,
-                term: e.term, date: e.date,
-              }))
+              exams: examsSnap.docs.map(d => {
+                const e = d.data() as any;
+                return {
+                  id: d.id,
+                  studentId: e.studentId,
+                  subject: e.subject,
+                  teacherId: e.teacherId,
+                  score: e.score,
+                  grade: e.grade,
+                  term: e.term,
+                  date: e.date,
+                };
+              })
             });
           }
 
-          if (heroSlidesRes.data && heroSlidesRes.data.length > 0) {
+          if (!heroSlidesSnap.empty) {
             set({
-              heroSlides: heroSlidesRes.data.map((s: any) => ({
-                id: s.id, image: s.image,
-                hadithAr: s.hadith_ar, hadithSo: s.hadith_so, hadithEn: s.hadith_en,
-              }))
+              heroSlides: heroSlidesSnap.docs.map(d => {
+                const s = d.data() as any;
+                return {
+                  id: d.id,
+                  image: s.image,
+                  hadithAr: s.hadithAr,
+                  hadithSo: s.hadithSo,
+                  hadithEn: s.hadithEn,
+                };
+              })
             });
           }
 
-          if (insightsRes.data && insightsRes.data.length > 0) {
+          if (!insightsSnap.empty) {
             set({
-              insights: insightsRes.data.map((i: any) => ({
-                id: i.id, image: i.image,
-                categorySo: i.category_so, categoryEn: i.category_en,
-                titleSo: i.title_so, titleEn: i.title_en,
-                contentSo: i.content_so, contentEn: i.content_en,
-                date: i.date,
-              }))
+              insights: insightsSnap.docs.map(d => {
+                const i = d.data() as any;
+                return {
+                  id: d.id,
+                  image: i.image,
+                  categorySo: i.categorySo,
+                  categoryEn: i.categoryEn,
+                  titleSo: i.titleSo,
+                  titleEn: i.titleEn,
+                  contentSo: i.contentSo,
+                  contentEn: i.contentEn,
+                  date: i.date,
+                };
+              })
             });
           }
         } catch (error) {
-          console.error('Supabase init failed. Catching error to prevent hydration crash:', error);
+          console.error('Firestore init failed. Catching error to prevent hydration crash:', error);
         }
+      },
+
+      /** @deprecated alias for backward compatibility */
+      initializeSupabase: async () => {
+        return useStore.getState().initializeFirestore();
       },
     }),
     {

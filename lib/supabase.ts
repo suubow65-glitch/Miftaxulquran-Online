@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+/**
+ * @deprecated This project has migrated from Supabase to Firebase.
+ * This file is kept only as a stub to prevent broken imports during the transition.
+ * All functionality now lives in lib/firebase.ts and lib/store.ts.
+ *
+ * DO NOT use this file for new code.
+ */
 
-const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const rawKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-// Fallback for build time if the user left the placeholder "[Halkan geli URL-kaagii]"
-const supabaseUrl = rawUrl.startsWith('http') ? rawUrl : 'https://placeholder.supabase.co';
-const supabaseAnonKey = rawKey || 'placeholder-key';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// No-op stub — import getFirebaseDb/getFirebaseAuth from './firebase' instead
+export const supabase = null as never;

@@ -1,17 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/lib/store";
 import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, User, ArrowRight, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function TeacherLogin() {
   const router = useRouter();
   const { lang, t } = useLanguage();
-  const teachers = useStore((s) => s.teachers);
   
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +18,7 @@ export default function TeacherLogin() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If already logged in, redirect to dashboard
+    // If already logged in via localStorage session, redirect to dashboard
     const session = localStorage.getItem("teacher_session");
     if (session) {
       router.push("/teacher/dashboard");
@@ -32,19 +31,12 @@ export default function TeacherLogin() {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: username,
-        password: password,
-      });
-
-      if (signInError || !data.session) {
-        setError(t("Magaca ama sirta waa khalad.", "Invalid username or password."));
-      } else {
-        localStorage.setItem("teacher_session", data.session.user.id);
-        router.push("/teacher/dashboard");
-      }
+      const auth = getFirebaseAuth();
+      const credential = await signInWithEmailAndPassword(auth, username, password);
+      localStorage.setItem("teacher_session", credential.user.uid);
+      router.push("/teacher/dashboard");
     } catch (err) {
-      setError(t("Cilad ayaa dhacday.", "An error occurred."));
+      setError(t("Magaca ama sirta waa khalad.", "Invalid username or password."));
     } finally {
       setLoading(false);
     }
@@ -86,19 +78,19 @@ export default function TeacherLogin() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-gray-700">
-                {t("Magaca Galitaanka", "Username")}
+                {t("Iimaaylka", "Email")}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   required
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0D5C2E]/50 focus:border-[#0D5C2E] transition-all font-medium"
-                  placeholder={t("Gali magacaaga", "Enter your username")}
+                  placeholder={t("Gali iimaaylkaaga", "Enter your email")}
                 />
               </div>
             </div>
