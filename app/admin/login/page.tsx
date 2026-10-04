@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, User, Loader2, LogIn } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { useStore, type CMSState } from "@/lib/store";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase";
 
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   
-  const settings = useStore(s => s.settings);
+  const settings = useStore((s: CMSState) => s.settings);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useStore, Student, Enrollment, AttendanceLog, AttendanceStatus } from "@/lib/store";
+import { useStore, Student, Enrollment, AttendanceLog, AttendanceStatus, type CMSState } from "@/lib/store";
 import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,10 +13,10 @@ export default function TeacherDashboard() {
   const router = useRouter();
   const { lang, t } = useLanguage();
   
-  const teachers = useStore(s => s.teachers);
-  const students = useStore(s => s.students);
-  const addAttendanceLog = useStore(s => s.addAttendanceLog);
-  const updateStudent = useStore(s => s.updateStudent);
+  const teachers = useStore((s: CMSState) => s.teachers);
+  const students = useStore((s: CMSState) => s.students);
+  const addAttendanceLog = useStore((s: CMSState) => s.addAttendanceLog);
+  const updateStudent = useStore((s: CMSState) => s.updateStudent);
   
   const [teacher, setTeacher] = useState<any>(null);
   const [assignedStudents, setAssignedStudents] = useState<Student[]>([]);

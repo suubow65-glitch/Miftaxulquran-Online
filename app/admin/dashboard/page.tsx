@@ -10,7 +10,7 @@ import {
   Loader2, Sparkles
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/lib/store";
+import { useStore, type CMSState } from "@/lib/store";
 import type { HeroSlide } from "@/lib/store";
 import { getFirebaseDb } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
@@ -138,10 +138,10 @@ function FileUpload({ value, onChange, accept, label }: { value: string, onChang
 
 /* ─────────────────────── PAYMENTS MODULE ─────────────────────── */
 function PaymentsModule() {
-  const students = useStore(s => s.students);
-  const payments = useStore(s => s.payments);
-  const addPayment = useStore(s => s.addPayment);
-  const updatePayment = useStore(s => s.updatePayment);
+  const students = useStore((s: CMSState) => s.students);
+  const payments = useStore((s: CMSState) => s.payments);
+  const addPayment = useStore((s: CMSState) => s.addPayment);
+  const updatePayment = useStore((s: CMSState) => s.updatePayment);
   const currentMonth = new Date().toISOString().slice(0, 7);
 
   const handleTogglePaid = (studentId: string) => {
@@ -217,11 +217,11 @@ function PaymentsModule() {
 
 /* ─────────────────────── EXAMS MODULE ─────────────────────── */
 function ExamsModule() {
-  const students = useStore(s => s.students);
-  const teachers = useStore(s => s.teachers);
-  const exams = useStore(s => s.exams);
-  const addExam = useStore(s => s.addExam);
-  const deleteExam = useStore(s => s.deleteExam);
+  const students = useStore((s: CMSState) => s.students);
+  const teachers = useStore((s: CMSState) => s.teachers);
+  const exams = useStore((s: CMSState) => s.exams);
+  const addExam = useStore((s: CMSState) => s.addExam);
+  const deleteExam = useStore((s: CMSState) => s.deleteExam);
 
   const [form, setForm] = useState({ studentId: "", subject: "", term: "", score: "", grade: "" });
 
@@ -347,7 +347,7 @@ function ExamsModule() {
 }
 
 /* ═══════════════════════ MAIN DASHBOARD ═══════════════════════ */
-import { signOut } from "firebase/auth";
+import { signOut, updatePassword } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function AdminDashboard() {
@@ -358,7 +358,7 @@ export default function AdminDashboard() {
   // Firebase Auth session is validated via cookie set at login.
   // Cookie-based protection is handled by middleware.ts.
 
-  const initializeFirestore = useStore((s) => s.initializeFirestore);
+  const initializeFirestore = useStore((s: CMSState) => s.initializeFirestore);
   useEffect(() => { initializeFirestore(); }, [initializeFirestore]);
 
   const handleLogout = async () => {
@@ -481,8 +481,8 @@ export default function AdminDashboard() {
 
 /* ─────────────────────── WHY US MODULE ─────────────────────── */
 function WhyUsModule() {
-  const featuresContent = useStore(s => s.featuresContent);
-  const updateFeaturesContent = useStore(s => s.updateFeaturesContent);
+  const featuresContent = useStore((s: CMSState) => s.featuresContent);
+  const updateFeaturesContent = useStore((s: CMSState) => s.updateFeaturesContent);
   
   const [form, setForm] = useState(featuresContent);
   const [saved, setSaved] = useState(false);
@@ -578,8 +578,8 @@ function WhyUsModule() {
 
 /* ─────────────────────── COURSE HELP CTA ─────────────────────── */
 function CourseHelpModule() {
-  const data = useStore(s => s.courseHelpCTA);
-  const update = useStore(s => s.updateCourseHelpCTA);
+  const data = useStore((s: CMSState) => s.courseHelpCTA);
+  const update = useStore((s: CMSState) => s.updateCourseHelpCTA);
 
   const [form, setForm] = useState(data);
   const [saved, setSaved] = useState(false);
@@ -729,8 +729,8 @@ function OverviewModule() {
 
 /* ─────────────────────── HERO ─────────────────────── */
 function HeroModule() {
-  const hero = useStore(state => state.hero);
-  const updateHero = useStore(state => state.updateHero);
+  const hero = useStore((state: CMSState) => state.hero);
+  const updateHero = useStore((state: CMSState) => state.updateHero);
   
   const [form, setForm] = useState(hero);
   const [saved, setSaved] = useState(false);
@@ -812,11 +812,11 @@ function HeroModule() {
 
 /* ─────────────────────── HERO SLIDESHOW ─────────────────────── */
 function HeroSlideshowModule() {
-  const heroSlides = useStore(state => state.heroSlides);
-  const addHeroSlide = useStore(state => state.addHeroSlide);
-  const updateHeroSlide = useStore(state => state.updateHeroSlide);
-  const deleteHeroSlide = useStore(state => state.deleteHeroSlide);
-  const reorderHeroSlides = useStore(state => state.reorderHeroSlides);
+  const heroSlides = useStore((state: CMSState) => state.heroSlides);
+  const addHeroSlide = useStore((state: CMSState) => state.addHeroSlide);
+  const updateHeroSlide = useStore((state: CMSState) => state.updateHeroSlide);
+  const deleteHeroSlide = useStore((state: CMSState) => state.deleteHeroSlide);
+  const reorderHeroSlides = useStore((state: CMSState) => state.reorderHeroSlides);
 
   const emptySlide: Omit<HeroSlide, "id"> = {
     image: "",
@@ -1089,8 +1089,8 @@ function HeroSlideshowModule() {
 
 /* ─────────────────────── STEPS ─────────────────────── */
 function StepsModule() {
-  const stepsContent = useStore(s => s.stepsContent);
-  const updateStepsContent = useStore(s => s.updateStepsContent);
+  const stepsContent = useStore((s: CMSState) => s.stepsContent);
+  const updateStepsContent = useStore((s: CMSState) => s.updateStepsContent);
 
   const [form, setForm] = useState(stepsContent);
   const [saved, setSaved] = useState(false);
@@ -1186,8 +1186,8 @@ function StepsModule() {
 
 /* ─────────────────────── STATS ─────────────────────── */
 function StatsModule() {
-  const statsContent = useStore(state => state.statsContent);
-  const updateStatsContent = useStore(state => state.updateStatsContent);
+  const statsContent = useStore((state: CMSState) => state.statsContent);
+  const updateStatsContent = useStore((state: CMSState) => state.updateStatsContent);
 
   const [form, setForm] = useState(statsContent);
   const [saved, setSaved] = useState(false);
@@ -1273,10 +1273,10 @@ function StatsModule() {
 
 /* ─────────────────────── COURSES ─────────────────────── */
 function CoursesModule() {
-  const courses = useStore(s => s.courses);
-  const addCourse = useStore(s => s.addCourse);
-  const updateCourse = useStore(s => s.updateCourse);
-  const deleteCourse = useStore(s => s.deleteCourse);
+  const courses = useStore((s: CMSState) => s.courses);
+  const addCourse = useStore((s: CMSState) => s.addCourse);
+  const updateCourse = useStore((s: CMSState) => s.updateCourse);
+  const deleteCourse = useStore((s: CMSState) => s.deleteCourse);
 
   type StoreCourse = typeof courses[number];
   const [editing, setEditing] = useState<StoreCourse | null>(null);
@@ -1592,10 +1592,10 @@ function CoursesModule() {
 
 /* ─────────────────────── LIBRARY ─────────────────────── */
 function LibraryModule() {
-  const books = useStore(s => s.library);
-  const addBook = useStore(s => s.addBook);
-  const updateBook = useStore(s => s.updateBook);
-  const deleteBook = useStore(s => s.deleteBook);
+  const books = useStore((s: CMSState) => s.library);
+  const addBook = useStore((s: CMSState) => s.addBook);
+  const updateBook = useStore((s: CMSState) => s.updateBook);
+  const deleteBook = useStore((s: CMSState) => s.deleteBook);
 
   type StoreBook = typeof books[number];
   const EMPTY_BOOK: StoreBook = { id: "", title: "", author: "", category: "quran", sizeMB: 0, pagesSo: "", pagesEn: "", downloadUrl: "", coverImage: "", color: "#27AE60", emoji: "📖" };
@@ -1726,10 +1726,10 @@ function LibraryModule() {
 
 /* ─────────────────────── TESTIMONIALS ─────────────────────── */
 function TestimonialsModule() {
-  const items = useStore(s => s.testimonials);
-  const deleteTestimonial = useStore(s => s.deleteTestimonial);
-  const approveTestimonial = useStore(s => s.approveTestimonial);
-  const updateTestimonial = useStore(s => s.updateTestimonial);
+  const items = useStore((s: CMSState) => s.testimonials);
+  const deleteTestimonial = useStore((s: CMSState) => s.deleteTestimonial);
+  const approveTestimonial = useStore((s: CMSState) => s.approveTestimonial);
+  const updateTestimonial = useStore((s: CMSState) => s.updateTestimonial);
   
   const pendingItems = items.filter(t => !t.isApproved);
   const liveItems = items.filter(t => t.isApproved);
@@ -1863,8 +1863,8 @@ function TestimonialsModule() {
 
 /* ─────────────────────── FAQ ─────────────────────── */
 function FaqModule() {
-  const faqContent = useStore(s => s.faqContent);
-  const updateFaqContent = useStore(s => s.updateFaqContent);
+  const faqContent = useStore((s: CMSState) => s.faqContent);
+  const updateFaqContent = useStore((s: CMSState) => s.updateFaqContent);
   const [saved, setSaved] = useState(false);
 
   type StoreFaq = typeof faqContent.faqs[number];
@@ -2106,8 +2106,8 @@ function MessagesModule() {
 
 /* ─────────────────────── SETTINGS ─────────────────────── */
 function SettingsModule() {
-  const settingsStore = useStore(s => s.settings);
-  const updateSettings = useStore(s => s.updateSettings);
+  const settingsStore = useStore((s: CMSState) => s.settings);
+  const updateSettings = useStore((s: CMSState) => s.updateSettings);
   const [settings, setSettings] = useState(settingsStore);
   const [saved, setSaved] = useState(false);
 
@@ -2138,7 +2138,7 @@ function SettingsModule() {
         <p className="text-xs text-gray-400 mb-6">These values appear in the site footer, contact section, and WhatsApp button.</p>
         <div className="space-y-5">
           {fields?.map(({ key, label, placeholder, isTextarea }) => (
-            <div key={key}>
+            <div key={key as string}>
               <label className="block text-xs font-bold text-gray-700 mb-2">{label}</label>
               {isTextarea ? (
                 <textarea value={settings[key] as string} onChange={e => setSettings(s => ({ ...s, [key]: e.target.value }))}
@@ -2185,9 +2185,9 @@ function SettingsModule() {
 
 /* ─────────────────────── LEADS ─────────────────────── */
 function LeadsModule() {
-  const leads = useStore(state => state.leads);
-  const updateLeadStatus = useStore(state => state.updateLeadStatus);
-  const deleteLead = useStore(state => state.deleteLead);
+  const leads = useStore((state: CMSState) => state.leads);
+  const updateLeadStatus = useStore((state: CMSState) => state.updateLeadStatus);
+  const deleteLead = useStore((state: CMSState) => state.deleteLead);
 
   return (
     <div className="space-y-6">
@@ -2260,11 +2260,11 @@ function LeadsModule() {
 
 /* ─────────────────────── TEACHERS ─────────────────────── */
 function TeachersModule() {
-  const teachers = useStore(state => state.teachers);
-  const addTeacher = useStore(state => state.addTeacher);
-  const updateTeacher = useStore(state => state.updateTeacher);
-  const deleteTeacher = useStore(state => state.deleteTeacher);
-  const updateTeacherCredentials = useStore(state => state.updateTeacherCredentials);
+  const teachers = useStore((state: CMSState) => state.teachers);
+  const addTeacher = useStore((state: CMSState) => state.addTeacher);
+  const updateTeacher = useStore((state: CMSState) => state.updateTeacher);
+  const deleteTeacher = useStore((state: CMSState) => state.deleteTeacher);
+  const updateTeacherCredentials = useStore((state: CMSState) => state.updateTeacherCredentials);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<any>(null);
@@ -2437,12 +2437,12 @@ function TeachersModule() {
 
 /* ─────────────────────── INSIGHTS ─────────────────────── */
 function InsightsModule() {
-  const insights = useStore(s => s.insights);
-  const addInsight = useStore(s => s.addInsight);
-  const deleteInsight = useStore(s => s.deleteInsight);
+  const insights = useStore((s: CMSState) => s.insights);
+  const addInsight = useStore((s: CMSState) => s.addInsight);
+  const deleteInsight = useStore((s: CMSState) => s.deleteInsight);
 
-  const insightsHeader = useStore(s => s.insightsHeader);
-  const updateInsightsHeader = useStore(s => s.updateInsightsHeader);
+  const insightsHeader = useStore((s: CMSState) => s.insightsHeader);
+  const updateInsightsHeader = useStore((s: CMSState) => s.updateInsightsHeader);
 
   const [headerForm, setHeaderForm] = useState(insightsHeader);
   const [headerSaved, setHeaderSaved] = useState(false);
@@ -2605,16 +2605,29 @@ function InsightsModule() {
 
 /* ─────────────────────── SECURITY ─────────────────────── */
 function SecurityModule() {
-  const settingsStore = useStore(s => s.settings);
-  const updateSettings = useStore(s => s.updateSettings);
+  const updateSettings = useStore((s: CMSState) => s.updateSettings);
+  const settingsStore = useStore((s: CMSState) => s.settings);
 
-  const [form, setForm] = useState({ adminUser: settingsStore.adminUser || "admin", adminPass: settingsStore.adminPass || "miftaxul2024" });
+  const [form, setForm] = useState({ adminUser: settingsStore.adminUser || "admin", adminPass: "" });
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
-  const save = () => {
-    updateSettings({ ...settingsStore, adminUser: form.adminUser, adminPass: form.adminPass });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const save = async () => {
+    setError("");
+    try {
+      const auth = getFirebaseAuth();
+      if (auth.currentUser && form.adminPass) {
+        await updatePassword(auth.currentUser, form.adminPass);
+        updateSettings({ ...settingsStore, adminUser: form.adminUser });
+        setForm(f => ({ ...f, adminPass: "" }));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      } else if (!form.adminPass) {
+        setError("Please enter a new password / Fadlan gali sirta cusub");
+      }
+    } catch (e: any) {
+      setError(e.message || "Failed to update password");
+    }
   };
 
   return (
@@ -2626,21 +2639,29 @@ function SecurityModule() {
         </h2>
         <p className="text-xs text-gray-500 mb-6">Change your dashboard login credentials.</p>
         
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-600">
+            {error}
+          </div>
+        )}
+
         <div className="space-y-4 mb-6">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Username</label>
             <input value={form.adminUser} onChange={e => setForm(f => ({ ...f, adminUser: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-red-500/50" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-red-500/50" disabled />
+            <p className="text-[10px] text-gray-400 mt-1">Username is managed in Firebase Authentication</p>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Password</label>
-            <input type="text" value={form.adminPass} onChange={e => setForm(f => ({ ...f, adminPass: e.target.value }))}
+            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">New Password / Sirta Cusub</label>
+            <input type="password" value={form.adminPass} onChange={e => setForm(f => ({ ...f, adminPass: e.target.value }))}
+              placeholder="Enter new password"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50" />
           </div>
         </div>
 
         <button onClick={save} className="w-full flex justify-center items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm transition-all hover:bg-red-600 bg-red-500">
-          {saved ? <><Check className="h-4 w-4" />Saved!</> : <><Save className="h-4 w-4" />Update Credentials</>}
+          {saved ? <><Check className="h-4 w-4" />Saved!</> : <><Save className="h-4 w-4" />Update / Cusboonaysii</>}
         </button>
       </div>
     </div>
@@ -2649,10 +2670,10 @@ function SecurityModule() {
 
 /* ─────────────────────── QURAN PLAYER ─────────────────────── */
 function QuranPlayerModule() {
-  const tracks = useStore(s => s.tracks);
-  const addTrack = useStore(s => s.addTrack);
-  const deleteTrack = useStore(s => s.deleteTrack);
-  const toggleTrackActive = useStore(s => s.toggleTrackActive);
+  const tracks = useStore((s: CMSState) => s.tracks);
+  const addTrack = useStore((s: CMSState) => s.addTrack);
+  const deleteTrack = useStore((s: CMSState) => s.deleteTrack);
+  const toggleTrackActive = useStore((s: CMSState) => s.toggleTrackActive);
 
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", reciter: "", audioDataUrl: "" });
@@ -2742,8 +2763,8 @@ function QuranPlayerModule() {
 
 /* ─────────────────────── CHALLENGES SECTION ─────────────────────── */
 function ChallengesModule() {
-  const content = useStore(s => s.challengesContent);
-  const updateContent = useStore(s => s.updateChallengesContent);
+  const content = useStore((s: CMSState) => s.challengesContent);
+  const updateContent = useStore((s: CMSState) => s.updateChallengesContent);
 
   const [form, setForm] = useState(content);
   const [saved, setSaved] = useState(false);
@@ -2908,8 +2929,8 @@ function ChallengesModule() {
 
 /* ─────────────────────── BOTTOM CTA MODULE ─────────────────────── */
 function BottomCTAModule() {
-  const bottomCTA = useStore(s => s.bottomCTA);
-  const updateBottomCTA = useStore(s => s.updateBottomCTA);
+  const bottomCTA = useStore((s: CMSState) => s.bottomCTA);
+  const updateBottomCTA = useStore((s: CMSState) => s.updateBottomCTA);
   
   const [form, setForm] = useState(bottomCTA);
   const [saved, setSaved] = useState(false);
@@ -3019,8 +3040,8 @@ function BottomCTAModule() {
 
 /* ─────────────────────── FOOTER MODULE ─────────────────────── */
 function FooterModule() {
-  const footerContent = useStore(s => s.footerContent);
-  const updateFooterContent = useStore(s => s.updateFooterContent);
+  const footerContent = useStore((s: CMSState) => s.footerContent);
+  const updateFooterContent = useStore((s: CMSState) => s.updateFooterContent);
   
   const [form, setForm] = useState(footerContent);
   const [saved, setSaved] = useState(false);
@@ -3095,8 +3116,8 @@ function FooterModule() {
 
 /* ─────────────────────── ABOUT US MODULE ─────────────────────── */
 function AboutModule() {
-  const content = useStore(s => s.aboutPageContent);
-  const update = useStore(s => s.updateAboutPageContent);
+  const content = useStore((s: CMSState) => s.aboutPageContent);
+  const update = useStore((s: CMSState) => s.updateAboutPageContent);
 
   const [form, setForm] = useState(content);
   const [saved, setSaved] = useState(false);
@@ -3277,8 +3298,8 @@ function AboutModule() {
 
 /* ─────────────────────── PRICING MODULE ─────────────────────── */
 function PricingModule() {
-  const content = useStore(s => s.pricingContent);
-  const update = useStore(s => s.updatePricingContent);
+  const content = useStore((s: CMSState) => s.pricingContent);
+  const update = useStore((s: CMSState) => s.updatePricingContent);
 
   const [form, setForm] = useState(content);
   const [saved, setSaved] = useState(false);
@@ -3516,8 +3537,8 @@ function PricingModule() {
    LIBRARY CONTENT MODULE
 ═══════════════════════════════════════ */
 function LibraryContentModule() {
-  const libraryPageContent = useStore(state => state.libraryPageContent);
-  const updateLibraryPageContent = useStore(state => state.updateLibraryPageContent);
+  const libraryPageContent = useStore((state: CMSState) => state.libraryPageContent);
+  const updateLibraryPageContent = useStore((state: CMSState) => state.updateLibraryPageContent);
   const [content, setContent] = useState(libraryPageContent);
   const [saving, setSaving] = useState(false);
 
@@ -3636,8 +3657,8 @@ function LibraryContentModule() {
    IJAZAH MODULE
 ═══════════════════════════════════════ */
 function IjazahModule() {
-  const ijazahContent = useStore(state => state.ijazahContent);
-  const updateIjazahContent = useStore(state => state.updateIjazahContent);
+  const ijazahContent = useStore((state: CMSState) => state.ijazahContent);
+  const updateIjazahContent = useStore((state: CMSState) => state.updateIjazahContent);
   const [content, setContent] = useState(ijazahContent);
   const [saving, setSaving] = useState(false);
 
@@ -3725,10 +3746,10 @@ function IjazahModule() {
    STUDENT MANAGEMENT MODULE
 ═══════════════════════════════════════ */
 function StudentsModule() {
-  const students = useStore(s => s.students);
-  const teachers = useStore(s => s.teachers);
-  const addStudent = useStore(s => s.addStudent);
-  const deleteStudent = useStore(s => s.deleteStudent);
+  const students = useStore((s: CMSState) => s.students);
+  const teachers = useStore((s: CMSState) => s.teachers);
+  const addStudent = useStore((s: CMSState) => s.addStudent);
+  const deleteStudent = useStore((s: CMSState) => s.deleteStudent);
   
   const [isAdding, setIsAdding] = useState(false);
   const [form, setForm] = useState({ name: "", studentId: "", status: "Active" as const, classDays: "", classTime: "", enrollments: [] as any[] });
@@ -3910,8 +3931,8 @@ function StudentsModule() {
    LESSON LOGS MODULE
 ═══════════════════════════════════════ */
 function LessonLogsModule() {
-  const logs = useStore(s => s.attendanceLogs);
-  const students = useStore(s => s.students);
+  const logs = useStore((s: CMSState) => s.attendanceLogs);
+  const students = useStore((s: CMSState) => s.students);
 
   // Sort logs by date descending
   const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

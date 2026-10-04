@@ -56,7 +56,7 @@ export default function TrackPage() {
   }, [attendanceLogs, student, activeSubject]);
 
   const heatmapDaysRaw = useMemo((): Array<{ date: Date; status: HeatStatus }> => {
-    const days = [];
+    const days: Array<{ date: Date; status: HeatStatus }> = [];
     const today = new Date();
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today);

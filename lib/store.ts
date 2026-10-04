@@ -436,7 +436,7 @@ export interface AttendanceLog {
   parentNote?: string;   // Confidential parent feedback
 }
 
-interface CMSState {
+export interface CMSState {
   // Data
   hero: HeroContent;
   heroSlides: HeroSlide[];
@@ -1042,7 +1042,7 @@ function clean<T extends Record<string, unknown>>(obj: T): T {
 
 export const useStore = create<CMSState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       hero: initialHero,
       heroSlides: initialHeroSlides,
       challengesContent: initialChallengesContent,
@@ -1605,7 +1605,7 @@ export const useStore = create<CMSState>()(
 
       /** @deprecated alias for backward compatibility */
       initializeSupabase: async () => {
-        return useStore.getState().initializeFirestore();
+        return get().initializeFirestore();
       },
     }),
     {
