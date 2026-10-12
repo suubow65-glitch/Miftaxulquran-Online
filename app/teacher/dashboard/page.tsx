@@ -1,13 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useStore, Student, Enrollment, AttendanceLog, AttendanceStatus, type CMSState } from "@/lib/store";
 import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
-import Image from "next/image";
-import { LogOut, BookOpen, Clock, Check, Save, X, Settings, User, AlertCircle, FileText, Loader2 } from "lucide-react";
-import { signOut } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
+import { LogOut, BookOpen, Clock, Check, Save, X, User, AlertCircle, FileText, Loader2 } from "lucide-react";
 
 export default function TeacherDashboard() {
   const router = useRouter();
@@ -32,41 +30,27 @@ export default function TeacherDashboard() {
   });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // Check Firebase Auth session stored in localStorage
-      const auth = getFirebaseAuth();
-      const currentUser = auth.currentUser;
-      const sessionUid = localStorage.getItem("teacher_session");
-
-      if (!currentUser && !sessionUid) {
-        router.push("/teacher/login");
-        return;
-      }
-
-      const uid = currentUser?.uid ?? sessionUid;
-      // Try to match by Firebase UID first, then fall back to username/email match
-      const tchr = teachers.find(t => t.id === uid) ?? teachers.find(t => t.username === uid);
-      if (!tchr) {
-        localStorage.removeItem("teacher_session");
-        router.push("/teacher/login");
-        return;
-      }
-      setTeacher(tchr);
-
-      const filtered = students.filter(s =>
-        s.enrollments.some(e => e.teacherId === tchr.id)
-      );
-      setAssignedStudents(filtered);
-      setLoading(false);
-    };
-    checkAuth();
+    // Local-only session: stored as teacher ID in localStorage
+    const sessionTeacherId = localStorage.getItem("teacher_session");
+    if (!sessionTeacherId) {
+      router.push("/teacher/login");
+      return;
+    }
+    const tchr = teachers.find(t => t.id === sessionTeacherId);
+    if (!tchr) {
+      localStorage.removeItem("teacher_session");
+      router.push("/teacher/login");
+      return;
+    }
+    setTeacher(tchr);
+    const filtered = students.filter(s =>
+      s.enrollments.some(e => e.teacherId === tchr.id)
+    );
+    setAssignedStudents(filtered);
+    setLoading(false);
   }, [router, teachers, students]);
 
   const handleLogout = async () => {
-    try {
-      const auth = getFirebaseAuth();
-      await signOut(auth);
-    } catch (_) { /* ignore */ }
     localStorage.removeItem("teacher_session");
     router.push("/teacher/login");
   };

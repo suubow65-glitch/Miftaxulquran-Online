@@ -1,23 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  type User,
-} from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
+import { createContext, useContext, useState, useMemo, type ReactNode } from "react";
 
 type AuthContextValue = {
-  user: User | null;
+  user: { email: string } | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -26,29 +12,23 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const auth = getFirebaseAuth();
-    return onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser);
-      setLoading(false);
-    });
-  }, []);
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
-      loading,
+      loading: false,
       login: async (email, password) => {
-        await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+        // Local-only auth is handled per-page via cookies/localStorage
+        setUser({ email });
       },
       logout: async () => {
-        await signOut(getFirebaseAuth());
+        setUser(null);
+        document.cookie = "miftaxul_admin_auth=; path=/; max-age=0";
+        localStorage.removeItem("teacher_session");
       },
     }),
-    [user, loading],
+    [user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { Phone, Mail, MapPin, MessageCircle, Send, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
-import { getFirebaseDb } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useStore, type CMSState } from "@/lib/store";
 
 interface FormData { name: string; email: string; phone: string; subject: string; message: string; }
 const EMPTY: FormData = { name: "", email: "", phone: "", subject: "", message: "" };
 
 export default function ContactPage() {
   const { t } = useLanguage();
+  const addContactMessage = useStore((s: CMSState) => s.addContactMessage);
   const [form, setForm] = useState<FormData>(EMPTY);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -19,9 +19,9 @@ export default function ContactPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
+    await new Promise((r) => setTimeout(r, 500));
     try {
-      const db = getFirebaseDb();
-      await addDoc(collection(db, "contacts"), { ...form, createdAt: serverTimestamp(), read: false });
+      addContactMessage({ name: form.name, email: form.email, phone: form.phone, subject: form.subject, message: form.message });
       setStatus("sent");
       setForm(EMPTY);
     } catch {

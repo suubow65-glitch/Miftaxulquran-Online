@@ -7,13 +7,12 @@ import {
   LogOut, ChevronRight, Users, Globe, Award, Clock, Plus, Pencil, Trash2,
   Save, X, Check, AlertCircle, Menu, Star, FileText, HelpCircle, BarChart3,
   UploadCloud, File as FileIcon, Lock, Music, PlayCircle, Image as LucideImage, ChevronUp, ChevronDown as ChevronDownIcon, DollarSign,
-  Loader2, Sparkles
+  Loader2, Sparkles, Mail
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useStore, type CMSState } from "@/lib/store";
 import type { HeroSlide } from "@/lib/store";
-import { getFirebaseDb } from "@/lib/firebase";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+
 
 /* ─────── Types ─────── */
 type Module = "overview" | "hero" | "hero-slideshow" | "why-us" | "challenges" | "steps" | "stats" | "about" | "leads" | "teachers" | "courses" | "pricing" | "courseHelp" | "library" | "testimonials" | "faq" | "bottomCTA" | "footer" | "settings" | "messages" | "insights" | "security" | "audio" | "library-content" | "ijazah" | "students" | "lesson-logs" | "payments" | "exams";
@@ -347,25 +346,13 @@ function ExamsModule() {
 }
 
 /* ═══════════════════════ MAIN DASHBOARD ═══════════════════════ */
-import { signOut, updatePassword } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
 
 export default function AdminDashboard() {
   const [module, setModule] = useState<Module>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
-  // Firebase Auth session is validated via cookie set at login.
-  // Cookie-based protection is handled by middleware.ts.
-
-  const initializeFirestore = useStore((s: CMSState) => s.initializeFirestore);
-  useEffect(() => { initializeFirestore(); }, [initializeFirestore]);
-
   const handleLogout = async () => {
-    try {
-      const auth = getFirebaseAuth();
-      await signOut(auth);
-    } catch (_) { /* ignore */ }
     document.cookie = "miftaxul_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/admin/login");
   };
@@ -2033,21 +2020,12 @@ function FaqModule() {
 
 /* ─────────────────────── MESSAGES ─────────────────────── */
 function MessagesModule() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
+  const contactMessages = useStore((s: CMSState) => s.contactMessages);
+  const markContactRead = useStore((s: CMSState) => s.markContactRead);
+  const deleteContactMessage = useStore((s: CMSState) => s.deleteContactMessage);
+  const messages = contactMessages as unknown as Message[];
+  const loading = false;
   const [selected, setSelected] = useState<Message | null>(null);
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const db = getFirebaseDb();
-        const q = query(collection(db, "contacts"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-        setMessages(snap.docs?.map(d => ({ id: d.id, ...d.data() } as Message)));
-      } catch { setMessages([]); } finally { setLoading(false); }
-    };
-    load();
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -2615,10 +2593,8 @@ function SecurityModule() {
   const save = async () => {
     setError("");
     try {
-      const auth = getFirebaseAuth();
-      if (auth.currentUser && form.adminPass) {
-        await updatePassword(auth.currentUser, form.adminPass);
-        updateSettings({ ...settingsStore, adminUser: form.adminUser });
+      if (form.adminPass) {
+        updateSettings({ ...settingsStore, adminUser: form.adminUser, adminPass: form.adminPass });
         setForm(f => ({ ...f, adminPass: "" }));
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
@@ -2650,7 +2626,7 @@ function SecurityModule() {
             <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Username</label>
             <input value={form.adminUser} onChange={e => setForm(f => ({ ...f, adminUser: e.target.value }))}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-red-500/50" disabled />
-            <p className="text-[10px] text-gray-400 mt-1">Username is managed in Firebase Authentication</p>
+            <p className="text-[10px] text-gray-400 mt-1">Username is stored in local settings</p>
           </div>
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">New Password / Sirta Cusub</label>
