@@ -1,5 +1,32 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { getFirebaseDb } from '@/lib/firebase';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+} from 'firebase/firestore';
+
+// Asynchronous Firestore sync helpers
+async function syncFirestoreDoc(col: string, id: string, data: any) {
+  try {
+    const db = getFirebaseDb();
+    await setDoc(doc(db, col, id), data, { merge: true });
+  } catch (err) {
+    console.warn(`[Firestore sync] ${col}/${id}:`, err);
+  }
+}
+
+async function deleteFirestoreDoc(col: string, id: string) {
+  try {
+    const db = getFirebaseDb();
+    await deleteDoc(doc(db, col, id));
+  } catch (err) {
+    console.warn(`[Firestore delete] ${col}/${id}:`, err);
+  }
+}
 
 export type Category = "quran" | "tajweed" | "arabic" | "islamic" | "seerah" | "all";
 
@@ -958,156 +985,461 @@ const initialExams: Exam[] = [
 // ZUSTAND STORE — 100% LOCAL (localStorage via persist)
 // ══════════════════════════════════════════════════════
 
-export const useStore = create<CMSState>()(
-  persist(
-    (set, get) => ({
-      hero: initialHero,
-      heroSlides: initialHeroSlides,
-      challengesContent: initialChallengesContent,
-      featuresContent: initialFeaturesContent,
-      stepsContent: initialStepsContent,
-      statsContent: initialStatsContent,
-      courseHelpCTA: initialCourseHelpCTA,
-      bottomCTA: initialBottomCTA,
-      footerContent: initialFooterContent,
-      aboutPageContent: initialAboutPageContent,
-      pricingContent: initialPricingContent,
-      libraryPageContent: initialLibraryPageContent,
-      insightsHeader: initialInsightsHeader,
-      ijazahContent: initialIjazahContent,
-      stats: initialStats,
-      settings: initialSettings,
-      courses: initialCourses,
-      library: initialLibrary,
-      faqContent: initialFaqContent,
-      testimonials: initialTestimonials,
-      leads: initialLeads,
-      contactMessages: [],
-      teachers: initialTeachers,
-      posts: initialPosts,
-      insights: initialInsights,
-      tracks: [
-        { id: "audio-1", title: "Al-Fatiha", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/001.mp3", isActive: true },
-        { id: "audio-2", title: "Al-Kahf", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/018.mp3", isActive: true },
-        { id: "audio-3", title: "Ar-Rahman", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/055.mp3", isActive: true },
-        { id: "audio-4", title: "Al-Mulk", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/067.mp3", isActive: true }
-      ],
-      hasInteractedAudio: false,
-      students: initialStudents,
-      attendanceLogs: initialAttendanceLogs,
-      payments: initialPayments,
-      exams: initialExams,
+export const useStore = create<CMSState>()((set, get) => ({
+  hero: initialHero,
+  heroSlides: initialHeroSlides,
+  challengesContent: initialChallengesContent,
+  featuresContent: initialFeaturesContent,
+  stepsContent: initialStepsContent,
+  statsContent: initialStatsContent,
+  courseHelpCTA: initialCourseHelpCTA,
+  bottomCTA: initialBottomCTA,
+  footerContent: initialFooterContent,
+  aboutPageContent: initialAboutPageContent,
+  pricingContent: initialPricingContent,
+  libraryPageContent: initialLibraryPageContent,
+  insightsHeader: initialInsightsHeader,
+  ijazahContent: initialIjazahContent,
+  stats: initialStats,
+  settings: initialSettings,
+  courses: initialCourses,
+  library: initialLibrary,
+  faqContent: initialFaqContent,
+  testimonials: initialTestimonials,
+  leads: initialLeads,
+  contactMessages: [],
+  teachers: initialTeachers,
+  posts: initialPosts,
+  insights: initialInsights,
+  tracks: [
+    { id: "audio-1", title: "Al-Fatiha", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/001.mp3", isActive: true },
+    { id: "audio-2", title: "Al-Kahf", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/018.mp3", isActive: true },
+    { id: "audio-3", title: "Ar-Rahman", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/055.mp3", isActive: true },
+    { id: "audio-4", title: "Al-Mulk", reciter: "Mishary Al-Afasy", audioDataUrl: "https://server8.mp3quran.net/afs/067.mp3", isActive: true }
+  ],
+  hasInteractedAudio: false,
+  students: initialStudents,
+  attendanceLogs: initialAttendanceLogs,
+  payments: initialPayments,
+  exams: initialExams,
 
-      // ── CMS CONTENT UPDATES (pure local) ──────────────────────────────────
-      updateHero: (hero) => set({ hero }),
-      updateChallengesContent: (c) => set({ challengesContent: c }),
-      updateFeaturesContent: (c) => set({ featuresContent: c }),
-      updateStepsContent: (c) => set({ stepsContent: c }),
-      updateStatsContent: (c) => set({ statsContent: c }),
-      updateCourseHelpCTA: (c) => set({ courseHelpCTA: c }),
-      updateBottomCTA: (c) => set({ bottomCTA: c }),
-      updateFooterContent: (c) => set({ footerContent: c }),
-      updateAboutPageContent: (c) => set({ aboutPageContent: c }),
-      updatePricingContent: (c) => set({ pricingContent: c }),
-      updateLibraryPageContent: (c) => set({ libraryPageContent: c }),
-      updateInsightsHeader: (c) => set({ insightsHeader: c }),
-      updateIjazahContent: (c) => set({ ijazahContent: c }),
-      updateStats: (stats) => set({ stats }),
-      updateSettings: (settings) => set({ settings }),
+  // ── CMS CONTENT UPDATES (Firestore sync) ──────────────────────────────────
+  updateHero: (hero) => {
+    set({ hero });
+    syncFirestoreDoc("cms_content", "hero", hero);
+  },
+  updateChallengesContent: (c) => {
+    set({ challengesContent: c });
+    syncFirestoreDoc("cms_content", "challenges", c);
+  },
+  updateFeaturesContent: (c) => {
+    set({ featuresContent: c });
+    syncFirestoreDoc("cms_content", "features", c);
+  },
+  updateStepsContent: (c) => {
+    set({ stepsContent: c });
+    syncFirestoreDoc("cms_content", "steps", c);
+  },
+  updateStatsContent: (c) => {
+    set({ statsContent: c });
+    syncFirestoreDoc("cms_content", "stats_section", c);
+  },
+  updateCourseHelpCTA: (c) => {
+    set({ courseHelpCTA: c });
+    syncFirestoreDoc("cms_content", "course_help_cta", c);
+  },
+  updateBottomCTA: (c) => {
+    set({ bottomCTA: c });
+    syncFirestoreDoc("cms_content", "bottom_cta", c);
+  },
+  updateFooterContent: (c) => {
+    set({ footerContent: c });
+    syncFirestoreDoc("cms_content", "footer", c);
+  },
+  updateAboutPageContent: (c) => {
+    set({ aboutPageContent: c });
+    syncFirestoreDoc("cms_content", "about", c);
+  },
+  updatePricingContent: (c) => {
+    set({ pricingContent: c });
+    syncFirestoreDoc("cms_content", "pricing", c);
+  },
+  updateLibraryPageContent: (c) => {
+    set({ libraryPageContent: c });
+    syncFirestoreDoc("cms_content", "library_page", c);
+  },
+  updateInsightsHeader: (c) => {
+    set({ insightsHeader: c });
+    syncFirestoreDoc("cms_content", "insights_header", c);
+  },
+  updateIjazahContent: (c) => {
+    set({ ijazahContent: c });
+    syncFirestoreDoc("cms_content", "ijazah", c);
+  },
+  updateStats: (stats) => {
+    set({ stats });
+    syncFirestoreDoc("cms_content", "site_stats", stats);
+  },
+  updateSettings: (settings) => {
+    set({ settings });
+    syncFirestoreDoc("cms_content", "site_settings", settings);
+  },
 
-      // ── HERO SLIDES ────────────────────────────────────────────────────────
-      addHeroSlide: (slide) => set((state) => ({ heroSlides: [...state.heroSlides, slide] })),
-      updateHeroSlide: (id, slide) => set((state) => ({ heroSlides: state.heroSlides.map((s) => (s.id === id ? slide : s)) })),
-      deleteHeroSlide: (id) => set((state) => ({ heroSlides: state.heroSlides.filter((s) => s.id !== id) })),
-      reorderHeroSlides: (slides) => set({ heroSlides: slides }),
+  // ── HERO SLIDES ────────────────────────────────────────────────────────────
+  addHeroSlide: (slide) => {
+    set((state) => ({ heroSlides: [...state.heroSlides, slide] }));
+    syncFirestoreDoc("hero_slides", slide.id, slide);
+  },
+  updateHeroSlide: (id, slide) => {
+    set((state) => ({ heroSlides: state.heroSlides.map((s) => (s.id === id ? slide : s)) }));
+    syncFirestoreDoc("hero_slides", id, slide);
+  },
+  deleteHeroSlide: (id) => {
+    set((state) => ({ heroSlides: state.heroSlides.filter((s) => s.id !== id) }));
+    deleteFirestoreDoc("hero_slides", id);
+  },
+  reorderHeroSlides: (slides) => {
+    set({ heroSlides: slides });
+    slides.forEach((slide) => syncFirestoreDoc("hero_slides", slide.id, slide));
+  },
 
-      // ── COURSES ────────────────────────────────────────────────────────────
-      addCourse: (course) => set((state) => ({ courses: [...state.courses, course] })),
-      updateCourse: (id, course) => set((state) => ({ courses: state.courses.map((c) => (c.id === id ? course : c)) })),
-      deleteCourse: (id) => set((state) => ({ courses: state.courses.filter((c) => c.id !== id) })),
+  // ── COURSES ────────────────────────────────────────────────────────────────
+  addCourse: (course) => {
+    set((state) => ({ courses: [...state.courses, course] }));
+    syncFirestoreDoc("courses", course.id, course);
+  },
+  updateCourse: (id, course) => {
+    set((state) => ({ courses: state.courses.map((c) => (c.id === id ? course : c)) }));
+    syncFirestoreDoc("courses", id, course);
+  },
+  deleteCourse: (id) => {
+    set((state) => ({ courses: state.courses.filter((c) => c.id !== id) }));
+    deleteFirestoreDoc("courses", id);
+  },
 
-      // ── BOOKS / LIBRARY ────────────────────────────────────────────────────
-      addBook: (book) => set((state) => ({ library: [...state.library, book] })),
-      updateBook: (id, book) => set((state) => ({ library: state.library.map((b) => (b.id === id ? book : b)) })),
-      deleteBook: (id) => set((state) => ({ library: state.library.filter((b) => b.id !== id) })),
+  // ── BOOKS / LIBRARY ────────────────────────────────────────────────────────
+  addBook: (book) => {
+    set((state) => ({ library: [...state.library, book] }));
+    syncFirestoreDoc("library", book.id, book);
+  },
+  updateBook: (id, book) => {
+    set((state) => ({ library: state.library.map((b) => (b.id === id ? book : b)) }));
+    syncFirestoreDoc("library", id, book);
+  },
+  deleteBook: (id) => {
+    set((state) => ({ library: state.library.filter((b) => b.id !== id) }));
+    deleteFirestoreDoc("library", id);
+  },
 
-      // ── FAQ ────────────────────────────────────────────────────────────────
-      updateFaqContent: (c) => set({ faqContent: c }),
+  // ── FAQ ────────────────────────────────────────────────────────────────────
+  updateFaqContent: (c) => {
+    set({ faqContent: c });
+    syncFirestoreDoc("cms_content", "faq", c);
+  },
 
-      // ── TESTIMONIALS ───────────────────────────────────────────────────────
-      submitTestimonial: (t) => {
-        const newItem: Testimonial = { ...t, id: `test-${Date.now()}`, isApproved: false, createdAt: new Date().toISOString() };
-        set((state) => ({ testimonials: [...state.testimonials, newItem] }));
-      },
-      approveTestimonial: (id) => set((state) => ({ testimonials: state.testimonials.map((item) => item.id === id ? { ...item, isApproved: true } : item) })),
-      updateTestimonial: (id, updates) => set((state) => ({ testimonials: state.testimonials.map((item) => item.id === id ? { ...item, ...updates } : item) })),
-      deleteTestimonial: (id) => set((state) => ({ testimonials: state.testimonials.filter((item) => item.id !== id) })),
+  // ── TESTIMONIALS ───────────────────────────────────────────────────────────
+  submitTestimonial: (t) => {
+    const newItem: Testimonial = { ...t, id: `test-${Date.now()}`, isApproved: false, createdAt: new Date().toISOString() };
+    set((state) => ({ testimonials: [...state.testimonials, newItem] }));
+    syncFirestoreDoc("testimonials", newItem.id, newItem);
+  },
+  approveTestimonial: (id) => {
+    set((state) => ({ testimonials: state.testimonials.map((item) => item.id === id ? { ...item, isApproved: true } : item) }));
+    const updated = get().testimonials.find((item) => item.id === id);
+    if (updated) syncFirestoreDoc("testimonials", id, updated);
+  },
+  updateTestimonial: (id, updates) => {
+    set((state) => ({ testimonials: state.testimonials.map((item) => item.id === id ? { ...item, ...updates } : item) }));
+    const updated = get().testimonials.find((item) => item.id === id);
+    if (updated) syncFirestoreDoc("testimonials", id, updated);
+  },
+  deleteTestimonial: (id) => {
+    set((state) => ({ testimonials: state.testimonials.filter((item) => item.id !== id) }));
+    deleteFirestoreDoc("testimonials", id);
+  },
 
-      // ── LEADS ──────────────────────────────────────────────────────────────
-      addLead: (lead) => set((state) => ({ leads: [lead, ...state.leads] })),
-      updateLeadStatus: (id, status) => set((state) => ({ leads: state.leads.map((l) => l.id === id ? { ...l, status } : l) })),
-      deleteLead: (id) => set((state) => ({ leads: state.leads.filter((l) => l.id !== id) })),
+  // ── LEADS ──────────────────────────────────────────────────────────────────
+  addLead: (lead) => {
+    set((state) => ({ leads: [lead, ...state.leads] }));
+    syncFirestoreDoc("leads", lead.id, lead);
+  },
+  updateLeadStatus: (id, status) => {
+    set((state) => ({ leads: state.leads.map((l) => l.id === id ? { ...l, status } : l) }));
+    const updated = get().leads.find((l) => l.id === id);
+    if (updated) syncFirestoreDoc("leads", id, updated);
+  },
+  deleteLead: (id) => {
+    set((state) => ({ leads: state.leads.filter((l) => l.id !== id) }));
+    deleteFirestoreDoc("leads", id);
+  },
 
-      // ── CONTACT MESSAGES ───────────────────────────────────────────────────
-      addContactMessage: (msg) => {
-        const newMsg: ContactMessage = { ...msg, id: `msg-${Date.now()}`, createdAt: new Date().toISOString(), read: false };
-        set((state) => ({ contactMessages: [newMsg, ...state.contactMessages] }));
-      },
-      markContactRead: (id) => set((state) => ({ contactMessages: state.contactMessages.map((m) => m.id === id ? { ...m, read: true } : m) })),
-      deleteContactMessage: (id) => set((state) => ({ contactMessages: state.contactMessages.filter((m) => m.id !== id) })),
+  // ── CONTACT MESSAGES ───────────────────────────────────────────────────────
+  addContactMessage: (msg) => {
+    const newMsg: ContactMessage = { ...msg, id: `msg-${Date.now()}`, createdAt: new Date().toISOString(), read: false };
+    set((state) => ({ contactMessages: [newMsg, ...state.contactMessages] }));
+    syncFirestoreDoc("contact_messages", newMsg.id, newMsg);
+  },
+  markContactRead: (id) => {
+    set((state) => ({ contactMessages: state.contactMessages.map((m) => m.id === id ? { ...m, read: true } : m) }));
+    const updated = get().contactMessages.find((m) => m.id === id);
+    if (updated) syncFirestoreDoc("contact_messages", id, updated);
+  },
+  deleteContactMessage: (id) => {
+    set((state) => ({ contactMessages: state.contactMessages.filter((m) => m.id !== id) }));
+    deleteFirestoreDoc("contact_messages", id);
+  },
 
-      // ── TEACHERS ───────────────────────────────────────────────────────────
-      addTeacher: (teacher) => set((state) => ({ teachers: [...state.teachers, teacher] })),
-      updateTeacher: (id, teacher) => set((state) => ({ teachers: state.teachers.map((t) => t.id === id ? teacher : t) })),
-      deleteTeacher: (id) => set((state) => ({ teachers: state.teachers.filter((t) => t.id !== id) })),
-      updateTeacherCredentials: (id, username, password) => set((state) => ({ teachers: state.teachers.map((t) => t.id === id ? { ...t, username, password } : t) })),
+  // ── TEACHERS ───────────────────────────────────────────────────────────────
+  addTeacher: (teacher) => {
+    set((state) => ({ teachers: [...state.teachers, teacher] }));
+    syncFirestoreDoc("teachers", teacher.id, teacher);
+  },
+  updateTeacher: (id, teacher) => {
+    set((state) => ({ teachers: state.teachers.map((t) => t.id === id ? teacher : t) }));
+    syncFirestoreDoc("teachers", id, teacher);
+  },
+  deleteTeacher: (id) => {
+    set((state) => ({ teachers: state.teachers.filter((t) => t.id !== id) }));
+    deleteFirestoreDoc("teachers", id);
+  },
+  updateTeacherCredentials: (id, username, password) => {
+    set((state) => ({ teachers: state.teachers.map((t) => t.id === id ? { ...t, username, password } : t) }));
+    const updated = get().teachers.find((t) => t.id === id);
+    if (updated) syncFirestoreDoc("teachers", id, updated);
+  },
 
-      // ── POSTS ──────────────────────────────────────────────────────────────
-      addPost: (post) => set((state) => ({ posts: [post, ...state.posts] })),
-      updatePost: (id, post) => set((state) => ({ posts: state.posts.map((p) => p.id === id ? post : p) })),
-      deletePost: (id) => set((state) => ({ posts: state.posts.filter((p) => p.id !== id) })),
+  // ── POSTS (OGAAL) ──────────────────────────────────────────────────────────
+  addPost: (post) => {
+    set((state) => ({ posts: [post, ...state.posts] }));
+    syncFirestoreDoc("posts", post.id, post);
+  },
+  updatePost: (id, post) => {
+    set((state) => ({ posts: state.posts.map((p) => p.id === id ? post : p) }));
+    syncFirestoreDoc("posts", id, post);
+  },
+  deletePost: (id) => {
+    set((state) => ({ posts: state.posts.filter((p) => p.id !== id) }));
+    deleteFirestoreDoc("posts", id);
+  },
 
-      // ── INSIGHTS ───────────────────────────────────────────────────────────
-      addInsight: (insight) => set((state) => ({ insights: [insight, ...state.insights] })),
-      updateInsight: (id, insight) => set((state) => ({ insights: state.insights.map((p) => p.id === id ? insight : p) })),
-      deleteInsight: (id) => set((state) => ({ insights: state.insights.filter((p) => p.id !== id) })),
+  // ── INSIGHTS ───────────────────────────────────────────────────────────────
+  addInsight: (insight) => {
+    set((state) => ({ insights: [insight, ...state.insights] }));
+    syncFirestoreDoc("insights", insight.id, insight);
+  },
+  updateInsight: (id, insight) => {
+    set((state) => ({ insights: state.insights.map((p) => p.id === id ? insight : p) }));
+    syncFirestoreDoc("insights", id, insight);
+  },
+  deleteInsight: (id) => {
+    set((state) => ({ insights: state.insights.filter((p) => p.id !== id) }));
+    deleteFirestoreDoc("insights", id);
+  },
 
-      // ── AUDIO TRACKS ───────────────────────────────────────────────────────
-      addTrack: (track) => set((state) => ({ tracks: [track, ...state.tracks] })),
-      deleteTrack: (id) => set((state) => ({ tracks: state.tracks.filter((t) => t.id !== id) })),
-      toggleTrackActive: (id) => set((state) => ({ tracks: state.tracks.map((t) => t.id === id ? { ...t, isActive: !t.isActive } : t) })),
-      setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
+  // ── AUDIO TRACKS ───────────────────────────────────────────────────────────
+  addTrack: (track) => {
+    set((state) => ({ tracks: [track, ...state.tracks] }));
+    syncFirestoreDoc("tracks", track.id, track);
+  },
+  deleteTrack: (id) => {
+    set((state) => ({ tracks: state.tracks.filter((t) => t.id !== id) }));
+    deleteFirestoreDoc("tracks", id);
+  },
+  toggleTrackActive: (id) => {
+    set((state) => ({ tracks: state.tracks.map((t) => t.id === id ? { ...t, isActive: !t.isActive } : t) }));
+    const updated = get().tracks.find((t) => t.id === id);
+    if (updated) syncFirestoreDoc("tracks", id, updated);
+  },
+  setHasInteractedAudio: (val) => set({ hasInteractedAudio: val }),
 
-      // ── STUDENTS ───────────────────────────────────────────────────────────
-      addStudent: (student) => set((state) => ({ students: [...state.students, student] })),
-      updateStudent: (id, student) => set((state) => ({ students: state.students.map((s) => s.id === id ? student : s) })),
-      deleteStudent: (id) => set((state) => ({ students: state.students.filter((s) => s.id !== id) })),
+  // ── STUDENTS ───────────────────────────────────────────────────────────────
+  addStudent: (student) => {
+    set((state) => ({ students: [...state.students, student] }));
+    syncFirestoreDoc("students", student.id, student);
+  },
+  updateStudent: (id, student) => {
+    set((state) => ({ students: state.students.map((s) => s.id === id ? student : s) }));
+    syncFirestoreDoc("students", id, student);
+  },
+  deleteStudent: (id) => {
+    set((state) => ({ students: state.students.filter((s) => s.id !== id) }));
+    deleteFirestoreDoc("students", id);
+  },
 
-      // ── ATTENDANCE LOGS ────────────────────────────────────────────────────
-      addAttendanceLog: (log) => set((state) => ({ attendanceLogs: [...state.attendanceLogs, log] })),
-      updateAttendanceLog: (id, log) => set((state) => ({ attendanceLogs: state.attendanceLogs.map((l) => l.id === id ? log : l) })),
-      deleteAttendanceLog: (id) => set((state) => ({ attendanceLogs: state.attendanceLogs.filter((l) => l.id !== id) })),
+  // ── ATTENDANCE LOGS ────────────────────────────────────────────────────────
+  addAttendanceLog: (log) => {
+    set((state) => ({ attendanceLogs: [...state.attendanceLogs, log] }));
+    syncFirestoreDoc("attendance_logs", log.id, log);
+  },
+  updateAttendanceLog: (id, log) => {
+    set((state) => ({ attendanceLogs: state.attendanceLogs.map((l) => l.id === id ? log : l) }));
+    syncFirestoreDoc("attendance_logs", id, log);
+  },
+  deleteAttendanceLog: (id) => {
+    set((state) => ({ attendanceLogs: state.attendanceLogs.filter((l) => l.id !== id) }));
+    deleteFirestoreDoc("attendance_logs", id);
+  },
 
-      // ── PAYMENTS ───────────────────────────────────────────────────────────
-      addPayment: (payment) => set((state) => ({ payments: [payment, ...state.payments] })),
-      updatePayment: (id, payment) => set((state) => ({ payments: state.payments.map((p) => p.id === id ? payment : p) })),
-      deletePayment: (id) => set((state) => ({ payments: state.payments.filter((p) => p.id !== id) })),
+  // ── PAYMENTS ───────────────────────────────────────────────────────────────
+  addPayment: (payment) => {
+    set((state) => ({ payments: [payment, ...state.payments] }));
+    syncFirestoreDoc("payments", payment.id, payment);
+  },
+  updatePayment: (id, payment) => {
+    set((state) => ({ payments: state.payments.map((p) => p.id === id ? payment : p) }));
+    syncFirestoreDoc("payments", id, payment);
+  },
+  deletePayment: (id) => {
+    set((state) => ({ payments: state.payments.filter((p) => p.id !== id) }));
+    deleteFirestoreDoc("payments", id);
+  },
 
-      // ── EXAMS ──────────────────────────────────────────────────────────────
-      addExam: (exam) => set((state) => ({ exams: [exam, ...state.exams] })),
-      updateExam: (id, exam) => set((state) => ({ exams: state.exams.map((e) => e.id === id ? exam : e) })),
-      deleteExam: (id) => set((state) => ({ exams: state.exams.filter((e) => e.id !== id) })),
+  // ── EXAMS ──────────────────────────────────────────────────────────────────
+  addExam: (exam) => {
+    set((state) => ({ exams: [exam, ...state.exams] }));
+    syncFirestoreDoc("exams", exam.id, exam);
+  },
+  updateExam: (id, exam) => {
+    set((state) => ({ exams: state.exams.map((e) => e.id === id ? exam : e) }));
+    syncFirestoreDoc("exams", id, exam);
+  },
+  deleteExam: (id) => {
+    set((state) => ({ exams: state.exams.filter((e) => e.id !== id) }));
+    deleteFirestoreDoc("exams", id);
+  },
 
-      // ── NO-OP BOOTSTRAP (legacy compatibility) ─────────────────────────────
-      initializeFirestore: async () => {
-        // No-op: all data is local — nothing to fetch
-      },
-      initializeSupabase: async () => {
-        // No-op: all data is local — nothing to fetch
-      },
-    }),
-    {
-      name: 'miftaxul-cms-storage',
+  // ── FIRESTORE HYDRATION & SEEDING ──────────────────────────────────────────
+  initializeFirestore: async () => {
+    try {
+      const db = getFirebaseDb();
+
+      // Helper to fetch collection
+      const fetchCollection = async <T>(colName: string): Promise<T[]> => {
+        try {
+          const snap = await getDocs(collection(db, colName));
+          return snap.docs.map((d) => d.data() as T);
+        } catch {
+          return [];
+        }
+      };
+
+      // 1. Fetch collections
+      const [
+        fbStudents,
+        fbTeachers,
+        fbCourses,
+        fbLibrary,
+        fbPosts,
+        fbInsights,
+        fbSlides,
+        fbTestimonials,
+        fbLeads,
+        fbMessages,
+        fbLogs,
+        fbPayments,
+        fbExams,
+        fbTracks,
+      ] = await Promise.all([
+        fetchCollection<Student>("students"),
+        fetchCollection<Teacher>("teachers"),
+        fetchCollection<Course>("courses"),
+        fetchCollection<Book>("library"),
+        fetchCollection<Post>("posts"),
+        fetchCollection<Insight>("insights"),
+        fetchCollection<HeroSlide>("hero_slides"),
+        fetchCollection<Testimonial>("testimonials"),
+        fetchCollection<Lead>("leads"),
+        fetchCollection<ContactMessage>("contact_messages"),
+        fetchCollection<AttendanceLog>("attendance_logs"),
+        fetchCollection<Payment>("payments"),
+        fetchCollection<Exam>("exams"),
+        fetchCollection<AudioTrack>("tracks"),
+      ]);
+
+      const updates: Partial<CMSState> = {};
+
+      // Hydrate or seed students
+      if (fbStudents.length > 0) updates.students = fbStudents;
+      else initialStudents.forEach((s) => syncFirestoreDoc("students", s.id, s));
+
+      // Hydrate or seed teachers
+      if (fbTeachers.length > 0) updates.teachers = fbTeachers;
+      else initialTeachers.forEach((t) => syncFirestoreDoc("teachers", t.id, t));
+
+      // Hydrate or seed courses
+      if (fbCourses.length > 0) updates.courses = fbCourses;
+      else initialCourses.forEach((c) => syncFirestoreDoc("courses", c.id, c));
+
+      // Hydrate or seed library
+      if (fbLibrary.length > 0) updates.library = fbLibrary;
+      else initialLibrary.forEach((b) => syncFirestoreDoc("library", b.id, b));
+
+      // Hydrate or seed posts
+      if (fbPosts.length > 0) updates.posts = fbPosts;
+      else initialPosts.forEach((p) => syncFirestoreDoc("posts", p.id, p));
+
+      // Hydrate or seed insights
+      if (fbInsights.length > 0) updates.insights = fbInsights;
+      else initialInsights.forEach((i) => syncFirestoreDoc("insights", i.id, i));
+
+      // Hydrate or seed hero slides
+      if (fbSlides.length > 0) updates.heroSlides = fbSlides;
+      else initialHeroSlides.forEach((s) => syncFirestoreDoc("hero_slides", s.id, s));
+
+      // Hydrate or seed testimonials
+      if (fbTestimonials.length > 0) updates.testimonials = fbTestimonials;
+      else initialTestimonials.forEach((t) => syncFirestoreDoc("testimonials", t.id, t));
+
+      // Hydrate or seed leads
+      if (fbLeads.length > 0) updates.leads = fbLeads;
+      else initialLeads.forEach((l) => syncFirestoreDoc("leads", l.id, l));
+
+      // Hydrate or seed contact messages
+      if (fbMessages.length > 0) updates.contactMessages = fbMessages;
+
+      // Hydrate or seed logs
+      if (fbLogs.length > 0) updates.attendanceLogs = fbLogs;
+      else initialAttendanceLogs.forEach((l) => syncFirestoreDoc("attendance_logs", l.id, l));
+
+      // Hydrate or seed payments
+      if (fbPayments.length > 0) updates.payments = fbPayments;
+      else initialPayments.forEach((p) => syncFirestoreDoc("payments", p.id, p));
+
+      // Hydrate or seed exams
+      if (fbExams.length > 0) updates.exams = fbExams;
+      else initialExams.forEach((e) => syncFirestoreDoc("exams", e.id, e));
+
+      // Hydrate or seed tracks
+      if (fbTracks.length > 0) updates.tracks = fbTracks;
+
+      // Hydrate CMS content & settings
+      try {
+        const settingsSnap = await getDoc(doc(db, "cms_content", "site_settings"));
+        if (settingsSnap.exists()) updates.settings = settingsSnap.data() as SiteSettings;
+        else syncFirestoreDoc("cms_content", "site_settings", initialSettings);
+
+        const statsSnap = await getDoc(doc(db, "cms_content", "site_stats"));
+        if (statsSnap.exists()) updates.stats = statsSnap.data() as SiteStats;
+        else syncFirestoreDoc("cms_content", "site_stats", initialStats);
+
+        const faqSnap = await getDoc(doc(db, "cms_content", "faq"));
+        if (faqSnap.exists()) updates.faqContent = faqSnap.data() as FaqContent;
+        else syncFirestoreDoc("cms_content", "faq", initialFaqContent);
+
+        const heroSnap = await getDoc(doc(db, "cms_content", "hero"));
+        if (heroSnap.exists()) updates.hero = heroSnap.data() as HeroContent;
+        else syncFirestoreDoc("cms_content", "hero", initialHero);
+      } catch (e) {
+        console.warn("Could not fetch CMS settings doc:", e);
+      }
+
+      set(updates);
+    } catch (err) {
+      console.warn("Firestore initialization warning:", err);
     }
-  )
-);
+  },
+
+  /** @deprecated */
+  initializeSupabase: async () => {},
+}));
+

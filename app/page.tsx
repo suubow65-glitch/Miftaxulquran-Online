@@ -16,6 +16,7 @@ import {
   initialStepsContent, initialStatsContent, initialStats, initialSettings,
   initialTestimonials
 } from "@/lib/store";
+import { uploadFileToStorage } from "@/lib/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─────────────── Helpers ─────────────── */
@@ -785,14 +786,25 @@ function TestimonialsSection() {
   const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({ name: "", location: "", rating: 5, content: "", image: "" });
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm(prev => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      setUploadingImage(true);
+      try {
+        const url = await uploadFileToStorage(file, "testimonials");
+        setForm(prev => ({ ...prev, image: url }));
+      } catch (err) {
+        console.warn("Storage upload failed, fallback to reader:", err);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setForm(prev => ({ ...prev, image: reader.result as string }));
+        };
+        reader.readAsDataURL(file);
+      } finally {
+        setUploadingImage(false);
+      }
     }
   };
 

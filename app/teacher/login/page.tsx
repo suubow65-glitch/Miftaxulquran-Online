@@ -5,6 +5,8 @@ import { useLanguage } from "@/components/language-provider";
 import Link from "next/link";
 import { Lock, User, ArrowRight, Loader2, ChevronDown } from "lucide-react";
 import { useStore, type CMSState } from "@/lib/store";
+import { getFirebaseAuth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function TeacherLogin() {
   const router = useRouter();
@@ -28,8 +30,6 @@ export default function TeacherLogin() {
     setError("");
     setLoading(true);
 
-    await new Promise((r) => setTimeout(r, 400));
-
     const teacher = teachers.find((t) => t.id === selectedTeacherId);
 
     if (!teacher) {
@@ -38,16 +38,24 @@ export default function TeacherLogin() {
       return;
     }
 
-    // Check password — if teacher has a password set, verify it; else allow any
-    if (teacher.password && teacher.password !== password) {
-      setError(t("Furaha sirta waa khalad.", "Incorrect password."));
+    try {
+      const auth = getFirebaseAuth();
+      const teacherEmail = `${teacher.username || teacher.id}@miftaxulquran.com`;
+      await signInWithEmailAndPassword(auth, teacherEmail, password);
+      localStorage.setItem("teacher_session", teacher.id);
+      router.push("/teacher/dashboard");
+    } catch (err: any) {
+      console.warn("Teacher Firebase Auth sign-in warning:", err);
+      // Fallback: check stored teacher password
+      if (teacher.password && teacher.password === password) {
+        localStorage.setItem("teacher_session", teacher.id);
+        router.push("/teacher/dashboard");
+      } else {
+        setError(t("Furaha sirta waa khalad.", "Incorrect password."));
+      }
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Store session
-    localStorage.setItem("teacher_session", teacher.id);
-    router.push("/teacher/dashboard");
   };
 
   return (

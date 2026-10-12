@@ -12,6 +12,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useStore, type CMSState } from "@/lib/store";
 import type { HeroSlide } from "@/lib/store";
+import { uploadFileToStorage, getFirebaseAuth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 
 /* ─────── Types ─────── */
@@ -69,17 +71,24 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 function FileUpload({ value, onChange, accept, label }: { value: string, onChange: (val: string) => void, accept: string, label: string }) {
   const [drag, setDrag] = useState(false);
+  const [uploading, setUploading] = useState(false);
   
   const processFile = async (file: File) => {
-    // ~3MB limit warning to avoid LocalStorage quota issues
-    if (file.size > 3 * 1024 * 1024 && accept.includes("audio")) {
-      alert("WARNING: This audio file is over 3MB. It may exceed the browser's LocalStorage limit, causing data to disappear on refresh. For larger files, consider hosting them externally and using a URL. Saving Reciter/Surah name will still work.");
-    }
+    setUploading(true);
     try {
-      const base64 = await fileToBase64(file);
-      onChange(base64);
-    } catch (e) {
-      alert("Failed to read file.");
+      const folder = accept.includes("image") ? "images" : accept.includes("audio") ? "audio" : "documents";
+      const url = await uploadFileToStorage(file, folder);
+      onChange(url);
+    } catch (err) {
+      console.warn("Storage upload failed, fallback to base64", err);
+      try {
+        const base64 = await fileToBase64(file);
+        onChange(base64);
+      } catch (e) {
+        alert("Failed to process file.");
+      }
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -99,7 +108,7 @@ function FileUpload({ value, onChange, accept, label }: { value: string, onChang
     }
   };
 
-  const isImage = value && (value.startsWith("data:image") || value.match(/\.(jpeg|jpg|gif|png|svg)$/i) != null);
+  const isImage = value && (value.startsWith("data:image") || value.startsWith("http") || value.match(/\.(jpeg|jpg|gif|png|svg|webp)/i) != null);
   
   return (
     <div>
@@ -110,15 +119,20 @@ function FileUpload({ value, onChange, accept, label }: { value: string, onChang
         onDrop={handleDrop}
         className={`relative border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-colors text-center ${drag ? "border-primary bg-primary-50" : "border-gray-300 hover:border-primary/50 bg-gray-50 hover:bg-gray-100/50"}`}
       >
-        <input type="file" accept={accept} onChange={handleChange} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-        {value ? (
+        <input type="file" accept={accept} onChange={handleChange} disabled={uploading} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full disabled:cursor-not-allowed" />
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2 py-4 text-primary">
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            <p className="text-xs font-bold">Uploading to Firebase Storage...</p>
+          </div>
+        ) : value ? (
           <div className="flex flex-col items-center gap-2 pointer-events-none">
             {isImage ? (
               <img src={value} alt="Preview" className="h-20 object-contain rounded-lg border border-gray-200 shadow-sm" />
             ) : (
               <div className="flex flex-col items-center justify-center gap-1 text-primary">
                 {accept === "audio/*" ? <Music className="h-8 w-8" /> : <FileIcon className="h-8 w-8" />}
-                <span className="text-xs font-bold">{accept === "audio/*" ? "Audio Track Selected" : "Document Selected"}</span>
+                <span className="text-xs font-bold">{accept === "audio/*" ? "Audio Track Uploaded" : "Document Uploaded"}</span>
               </div>
             )}
             <p className="text-xs text-gray-500 font-medium">Click or drag to replace</p>
@@ -127,7 +141,7 @@ function FileUpload({ value, onChange, accept, label }: { value: string, onChang
           <div className="flex flex-col items-center text-gray-500 gap-2 pointer-events-none">
             <UploadCloud className={`h-7 w-7 ${drag ? "text-primary" : "text-gray-400"}`} />
             <p className="text-sm font-medium"><span className="text-primary font-bold">Click to upload</span> or drag and drop</p>
-            <p className="text-xs text-gray-400">{accept === "image/*" ? "SVG, PNG, JPG or GIF" : accept === "audio/*" ? "MP3 files" : "PDF files"}</p>
+            <p className="text-xs text-gray-400">{accept === "image/*" ? "SVG, PNG, JPG, WebP" : accept === "audio/*" ? "MP3 files" : "PDF files"}</p>
           </div>
         )}
       </div>
@@ -352,7 +366,16 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
+  const initializeFirestore = useStore((s: CMSState) => s.initializeFirestore);
+  useEffect(() => {
+    initializeFirestore();
+  }, [initializeFirestore]);
+
   const handleLogout = async () => {
+    try {
+      const auth = getFirebaseAuth();
+      await signOut(auth);
+    } catch (_) {}
     document.cookie = "miftaxul_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.push("/admin/login");
   };

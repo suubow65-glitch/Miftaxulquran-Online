@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, Mail, Loader2, LogIn, Eye, EyeOff } from "lucide-react";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/lib/store";
+import { getFirebaseAuth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -26,18 +28,30 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    // Simulate a brief delay for UX
-    await new Promise((r) => setTimeout(r, 500));
-
-    if (email.trim() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    try {
+      const auth = getFirebaseAuth();
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800"; // 7 days
       router.push("/admin/dashboard");
       router.refresh();
-    } else {
-      setError("Email ama Password khaldan. Isku day: admin@miftaxulquran.com / admin123");
+    } catch (err: any) {
+      console.warn("Firebase Auth sign-in warning:", err);
+      // Fallback for bootstrap admin credentials
+      if (email.trim() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
+        router.push("/admin/dashboard");
+        router.refresh();
+      } else {
+        const code = err?.code;
+        if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") {
+          setError("Email ama Password khaldan. (Invalid email or password)");
+        } else {
+          setError(err?.message || "Khalad ayaa dhacay xilliga galitaanka.");
+        }
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
