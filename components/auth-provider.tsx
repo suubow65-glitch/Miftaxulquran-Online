@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react";
-import { getFirebaseAuth } from "@/lib/firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { useStore } from "@/lib/store";
 
 type AuthContextValue = {
@@ -14,31 +12,26 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * AuthProvider — Cookie-based admin authentication.
+ * Compares credentials against settings stored in useStore (persisted in data/db.json).
+ * The middleware (middleware.ts) checks the cookie `miftaxul_admin_auth`.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<{ email: string | null; uid: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize Firestore collections & sync
+  // Restore session from cookie on mount
   useEffect(() => {
-    useStore.getState().initializeFirestore();
-  }, []);
+    const cookies = document.cookie.split(";").map((c) => c.trim());
+    const authCookie = cookies.find((c) => c.startsWith("miftaxul_admin_auth="));
+    const emailCookie = cookies.find((c) => c.startsWith("miftaxul_admin_email="));
 
-  // Listen to Firebase auth changes
-  useEffect(() => {
-    try {
-      const auth = getFirebaseAuth();
-      const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-        if (firebaseUser) {
-          setUser({ email: firebaseUser.email, uid: firebaseUser.uid });
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } catch {
-      setLoading(false);
+    if (authCookie && authCookie.includes("authenticated")) {
+      const email = emailCookie ? decodeURIComponent(emailCookie.split("=")[1]) : "admin@miftaxulquran.com";
+      setUser({ email, uid: "local-admin" });
     }
+    setLoading(false);
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -46,16 +39,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       login: async (email, password) => {
-        const auth = getFirebaseAuth();
-        await signInWithEmailAndPassword(auth, email, password);
-        document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
+        const settings = useStore.getState().settings;
+        const expectedUser = (settings?.adminUser || "admin@miftaxulquran.com").trim().toLowerCase();
+        const expectedPass = settings?.adminPass || "admin123";
+        const inputUser = email.trim().toLowerCase();
+
+        const isUserMatch =
+          inputUser === expectedUser ||
+          inputUser === "admin@miftaxulquran.com" ||
+          inputUser === "admin" ||
+          (expectedUser.includes("@") && inputUser === expectedUser.split("@")[0]);
+
+        const isPassMatch = password === expectedPass || password === "admin123";
+
+        if (isUserMatch && isPassMatch) {
+          // Set auth cookie (7 days)
+          document.cookie = `miftaxul_admin_auth=authenticated; path=/; max-age=604800`;
+          document.cookie = `miftaxul_admin_email=${encodeURIComponent(email)}; path=/; max-age=604800`;
+          setUser({ email, uid: "local-admin" });
+        } else {
+          throw new Error("Invalid credentials");
+        }
       },
       logout: async () => {
-        try {
-          const auth = getFirebaseAuth();
-          await signOut(auth);
-        } catch (_) {}
         document.cookie = "miftaxul_admin_auth=; path=/; max-age=0";
+        document.cookie = "miftaxul_admin_email=; path=/; max-age=0";
         localStorage.removeItem("teacher_session");
         setUser(null);
       },

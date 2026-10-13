@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/components/auth-provider";
+import { DataRecovery } from "@/components/data-recovery";
 import { FirebaseAnalytics } from "@/components/firebase-analytics";
 import { LanguageProvider } from "@/components/language-provider";
 import { SiteHeader } from "@/components/site-header";
@@ -15,6 +16,15 @@ export const metadata: Metadata = {
   description:
     "Miftaxul Quran Online — Barashada Qur'aanka, Tajwiidka, iyo Luqadda Carabiga iyada oo macalimiin Ijazah haysta. Learn Quran online with certified teachers.",
   keywords: ["quran online", "tajweed", "arabic", "somali quran school", "miftaxul quran"],
+  icons: {
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/logo.png",
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     siteName: "Miftaxul Quran Online",
     locale: "so_SO",
@@ -27,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="so" suppressHydrationWarning className="h-full">
       <body className="min-h-full flex flex-col bg-white text-gray-900 antialiased">
         <AuthProvider>
+          <DataRecovery />
           <FirebaseAnalytics />
           <LanguageProvider>
             <SiteHeader />

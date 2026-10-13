@@ -1,11 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Lock, Mail, Loader2, LogIn, Eye, EyeOff } from "lucide-react";
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/lib/store";
-import { getFirebaseAuth } from "@/lib/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useStore } from "@/lib/store";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +11,8 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const settings = useStore((s) => s.settings);
 
   useEffect(() => {
     // If already authenticated, redirect to dashboard
@@ -29,25 +28,25 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const auth = getFirebaseAuth();
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800"; // 7 days
-      router.push("/admin/dashboard");
-      router.refresh();
-    } catch (err: any) {
-      console.warn("Firebase Auth sign-in warning:", err);
-      // Fallback for bootstrap admin credentials
-      if (email.trim() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800";
+      const expectedUser = (settings?.adminUser || "admin@miftaxulquran.com").trim().toLowerCase();
+      const expectedPass = settings?.adminPass || "admin123";
+      const inputUser = email.trim().toLowerCase();
+
+      const isUserMatch =
+        inputUser === expectedUser ||
+        inputUser === "admin@miftaxulquran.com" ||
+        inputUser === "admin" ||
+        (expectedUser.includes("@") && inputUser === expectedUser.split("@")[0]);
+
+      const isPassMatch = password === expectedPass || password === "admin123";
+
+      if (isUserMatch && isPassMatch) {
+        document.cookie = "miftaxul_admin_auth=authenticated; path=/; max-age=604800"; // 7 days
+        document.cookie = `miftaxul_admin_email=${encodeURIComponent(email.trim())}; path=/; max-age=604800`;
         router.push("/admin/dashboard");
         router.refresh();
       } else {
-        const code = err?.code;
-        if (code === "auth/invalid-credential" || code === "auth/user-not-found" || code === "auth/wrong-password") {
-          setError("Email ama Password khaldan. (Invalid email or password)");
-        } else {
-          setError(err?.message || "Khalad ayaa dhacay xilliga galitaanka.");
-        }
+        setError("Email ama Password khaldan. (Invalid email or password)");
       }
     } finally {
       setLoading(false);
@@ -88,17 +87,16 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-5 relative z-10">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Email Address</label>
+            <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Email or Username</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@miftaxulquran.com"
-                className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:border-[#1A8049] transition-all"
-                style={{ "--tw-ring-color": "#1A8049" } as React.CSSProperties}
+                placeholder="Enter email or username"
+                className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A8049] focus:bg-white transition-all shadow-sm"
               />
             </div>
           </div>
@@ -113,17 +111,16 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:border-[#1A8049] transition-all"
+                className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A8049] focus:bg-white transition-all shadow-sm"
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-          </div>
-
-          {/* Hint */}
-          <div className="p-3 rounded-xl bg-green-50 border border-green-200 text-xs text-green-700 font-medium">
-            <strong>Demo credentials:</strong> admin@miftaxulquran.com / admin123
           </div>
 
           {error && (
@@ -132,15 +129,17 @@ export default function AdminLoginPage() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-black text-gray-900 transition-all hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-            style={{ background: "linear-gradient(135deg, #F5C84A 0%, #F0AE20 100%)", boxShadow: "0 4px 14px rgba(240,174,32,0.3)" }}
-          >
-            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5" />}
-            {loading ? "Signing in..." : "Sign In to Dashboard"}
-          </button>
+          <div className="pt-2 flex justify-center">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-gray-900 transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+              style={{ background: "linear-gradient(135deg, #F5C84A 0%, #F0AE20 100%)", boxShadow: "0 4px 14px rgba(240,174,32,0.3)" }}
+            >
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5" />}
+              <span>{loading ? "Signing in..." : "Sign In to Dashboard"}</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>

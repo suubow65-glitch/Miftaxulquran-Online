@@ -1,14 +1,8 @@
-"use client";
-
-import { useEffect } from "react";
-import { getFirebaseAnalytics } from "@/lib/firebase";
-
+/**
+ * Firebase Analytics has been removed from this project.
+ * This component is kept as a no-op so the import in app/layout.tsx
+ * continues to work without changes.
+ */
 export function FirebaseAnalytics() {
-  useEffect(() => {
-    getFirebaseAnalytics().catch((err) => {
-      console.warn("Analytics initialization skipped:", err);
-    });
-  }, []);
-
   return null;
 }

@@ -1,0 +1,929 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Miftaxul Quran Online — Local JSON Database (SOSTEC)",
+    "lastUpdated": "2026-10-13T10:15:00.985Z"
+  },
+  "hero": {
+    "headlineSo": "Baro Qur'aanka Kariimka adigoo gurigaaga jooga",
+    "headlineEn": "Learn the Holy Quran from the comfort of your home",
+    "subheadlineSo": "Miftaxul Quran Online waa dugsi onlayn ah oo kuu fududeynaya barashada Qur'aanka. Waxaan bixinaa fasallo toos ah, macalimiin khibrad leh, iyo jadwal ku habboon waqtigaaga.",
+    "subheadlineEn": "Miftaxul Quran Online is an online school that makes learning the Quran easy. We offer live classes, experienced teachers, and flexible schedules.",
+    "ctaTextSo": "Halkan iska diwaan geli",
+    "ctaTextEn": "Enrol Now"
+  },
+  "heroSlides": [
+    {
+      "id": "slide-1",
+      "image": "/uploads/image_1791884562182_e031n.jpg",
+      "hadithAr": "قَالَ رَسُولُ اللهِ ﷺ:خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+      "hadithSo": "Rasuulka Alle ﷺ wuxuu yiri:\n“Kan idiinku kheyr badan waa kan Qur’aanka barta oo dadka bara.”",
+      "hadithEn": "The Messenger of Allah ﷺ said:\n“The best of you are those who learn the Qur’an and teach it.”"
+    },
+    {
+      "id": "slide-2",
+      "image": "/uploads/image_1791884562182_obvnb.jpg",
+      "hadithAr": "قَالَ رَسُولُ اللهِ ﷺ:\nاقْرَؤُوا الْقُرْآنَ، فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لِأَصْحَابِهِ.",
+      "hadithSo": "Rasuulka Alle ﷺ wuxuu yiri:\n“Akhriya Qur’aanka, waayo wuxuu iman doonaa Maalinta Qiyaamaha isagoo u shafeecaya kuwa la saaxiibay.”",
+      "hadithEn": "The Messenger of Allah ﷺ said:\n“Recite the Qur’an, for it will come on the Day of Resurrection and intercede for its companions.”"
+    },
+    {
+      "id": "slide-3",
+      "image": "/uploads/image_1791884562183_xqbsf.jpg",
+      "hadithAr": "قَالَ رَسُولُ اللهِ ﷺ:\nمَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللهِ فَلَهُ بِهِ حَسَنَةٌ، وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا.",
+      "hadithSo": "Rasuulka Alle ﷺ wuxuu yiri:\n“Qofkii akhriya hal xaraf oo ka mid ah Kitaabka Alle wuxuu leeyahay hal xasanaad, xasanaaddana toban jeer ayaa loo laalaabaa.”",
+      "hadithEn": "The Messenger of Allah ﷺ said:\n“Whoever recites a letter from the Book of Allah will have one good deed, and each good deed is multiplied by ten.”"
+    }
+  ],
+  "challengesContent": {
+    "badgeTextSo": "Su'aalo muhiim ah",
+    "badgeTextEn": "Important questions",
+    "mainTitleSo": "Ma la kulantaa caqabadahan?",
+    "mainTitleEn": "Do you face these challenges?",
+    "cards": [
+      {
+        "id": "c-1",
+        "icon": "😟",
+        "titleSo": "Walwal ku saabsan sida aad ku baran laheyd Qur'aanka?",
+        "titleEn": "Worried About How You’ll Learn the Qur’an?",
+        "descSo": "Ma tahay waalid doonaya in carruurtiisu helaan waxbarasho diimeed oo tayo leh, ama qof doonaya inuu isagu barto Qur’aanka Kariimka ah?",
+        "descEn": "Are you a parent seeking quality Islamic education for your children, or someone who wants to learn the Holy Qur’an themselves?"
+      },
+      {
+        "id": "c-2",
+        "icon": "⏰",
+        "titleSo": "Waqti la'aan iyo mashquul",
+        "titleEn": "Lack of time & busy schedule",
+        "descSo": "Shaqada iyo mashquulka nololeed ma kuu diidayaan inaad waqti u hesho barashada Qur’aanka?\n",
+        "descEn": "Are work and daily life keeping you from finding time to learn the Qur’an?"
+      },
+      {
+        "id": "c-3",
+        "icon": "📖",
+        "titleSo": "Akhriska Qur'aanka oo kugu adag",
+        "titleEn": "Difficulty reading the Quran",
+        "descSo": "Ma ku dhibantahay adiga iyo ubadkaaguba kicinta iyo akhrinta Qur'aanka kariimka?",
+        "descEn": "Do you and your children find it difficult to recite and read the Holy Quran?"
+      },
+      {
+        "id": "c-4",
+        "icon": "👨‍🏫",
+        "titleSo": "Helidda Maclimiin Tayo leh",
+        "titleEn": "Finding a Qualified Qur’an Teacher",
+        "descSo": "Ma raadinaysaa macalimiin khibrad leh oo heysta Ijazah dhab ah iyo manhaj tayo sare leh?",
+        "descEn": "Are you looking for experienced teachers with authentic Ijazah and a high-quality curriculum?"
+      },
+      {
+        "id": "c-5",
+        "icon": "🌍",
+        "titleSo": "Ma helikaro ama wuu igu fogyahay dugsi quran",
+        "titleEn": "Can’t Find a Qur’an School, or Is It Too Far from You",
+        "descSo": "ma joogtaa wadan aan si sahlan looga heleyn dugis quran ama halka aad degantahay ayaa ka fog Dugsiga?",
+        "descEn": "Do You Live in a Country Where Qur’an Schools Are Not Easily Accessible, or Is the Nearest School Too Far from Where You Live?"
+      },
+      {
+        "id": "c-6",
+        "icon": "📅",
+        "titleSo": "Jadwal aan Munaasab ku aheyn wakhtigaaga ama kan Caruurtaada",
+        "titleEn": "A Schedule That Doesn’t Fit Your Schedule or Your Children",
+        "descSo": "Ma raadinaysaa dugsi aad dooran kartid maalmaha iyo saacadaha aad firaaqada leedihiin adiga iyo caruurtaada?",
+        "descEn": "Are you looking for a Qur’an school where you can choose the days and times that best fit your schedule and your children’s?"
+      }
+    ],
+    "bannerTitleSo": "Caqabadahaas oo dhan, MiftaxulQuran wuxuu u hayaa xal wax ku ool ah, waana sababta ugu weyn ee loo aasaasay.",
+    "bannerTitleEn": "MiftaxulQuran provides effective solutions to all these challenges, which is the primary reason it was established.",
+    "bannerDescSo": "Waxaan bixinaa Waxbarasho Diimeed oo tayo sare le,  taas oo si nidaamsan kuu barayaan macalimiin heysta Ijaazo iyo Manhaj nidaamsan, meelkasta oo aad joogto iyo wakhti kasta oo kugu haboon !",
+    "bannerDescEn": "Religious Education\n\nWe provide high-quality Islamic education delivered through a structured learning program by qualified teachers holding Ijazah, wherever you are and at a time that suits you best.",
+    "buttonTextSo": "Eeg Faahfaahinta",
+    "buttonTextEn": "Learn More"
+  },
+  "featuresContent": {
+    "mainHeadingSo": "Maxaad Si Gaar ah Ugu Dooranaysaa MiftaxulQuran?",
+    "mainHeadingEn": "Why Choose MiftaxulQuran?",
+    "subHeadingSo": "MiftaxulQuran wuxuu kuu fududeynayaa barashada Qur’aanka Kariimka ah meel kasta oo aad joogto, iyadoo lagu barayo hab nidaamsan, macallimiin aqoon iyo khibrad leh, iyo casharro ku habboon heerkaaga.",
+    "subHeadingEn": "MiftaxulQuran makes learning the Holy Qur’an easy and accessible from wherever you are, with a structured learning approach, qualified and experienced teachers, and lessons tailored to your level.",
+    "features": [
+      {
+        "id": "f-1",
+        "iconName": "Users",
+        "titleSo": "Casharro Gaar ah",
+        "titleEn": "Private Lessons",
+        "descSo": "Waxaad heli doontaa macallin kuu gaar ah oo si toos ah kula shaqaynaya, kuna siinaya casharro ku habboon heerkaaga iyo baahiyahaaga waxbarasho.",
+        "descEn": "You will have a dedicated teacher who works with you individually, providing lessons tailored to your learning level and educational needs."
+      },
+      {
+        "id": "f-2",
+        "iconName": "Clock",
+        "titleSo": "Jadwal Kugu Haboon",
+        "titleEn": "Flexible Schedule",
+        "descSo": "Waxaad dooranaysaa maalmaha iyo saacadaha kugu haboon.",
+        "descEn": "You choose the days and times that suit your schedule."
+      },
+      {
+        "id": "f-3",
+        "iconName": "GraduationCap",
+        "titleSo": "Macalimiin Khibrad leh",
+        "titleEn": "Expert Teachers",
+        "descSo": "Macalimiin Ijazah haysta oo leh aqoon iyo khibrad sare.",
+        "descEn": "Ijazah-certified teachers with deep knowledge and experience."
+      },
+      {
+        "id": "f-4",
+        "iconName": "Globe",
+        "titleSo": "Ka barankarta Meelkasta & Alaadkasta",
+        "titleEn": "Anywhere & Any Device",
+        "descSo": "Computer, tablet, ama mobile, meelkasta oo aad joogto.",
+        "descEn": "Computer, tablet, or mobile, learn from anywhere."
+      },
+      {
+        "id": "f-5",
+        "iconName": "Shield",
+        "titleSo": "Jawi Haboon",
+        "titleEn": "Suitable Environment",
+        "descSo": "Jawi waxbarasho oo deggan oo ku habboon Waxbarashada, kaas oo kaa caawinaya inaad si fudud wax u barato, u horumarto, una gaarto yoolalkaaga waxbarasho.   ",
+        "descEn": "A calm and supportive learning environment that helps you learn easily, improve your skills, and achieve your educational goals."
+      },
+      {
+        "id": "f-6",
+        "iconName": "Award",
+        "titleSo": "Warbixin Joogto ah",
+        "titleEn": "Regular Progress Reports",
+        "descSo": "Warbixin toddobaadleed oo ku saabsan horumarkaaga waxbarashada.",
+        "descEn": "Weekly reports keeping you informed about learning progress."
+      },
+      {
+        "id": "f-7",
+        "iconName": "Heart",
+        "titleSo": "Shahaadada Ijazah",
+        "titleEn": "Ijazah Certificate",
+        "descSo": "Ardaygu waxa uu heli doonaa Ijazah marka uu dhameeyo barashada.",
+        "descEn": "Students receive authentic Ijazah upon program completion."
+      },
+      {
+        "id": "f-8",
+        "iconName": "BookOpen",
+        "titleSo": "Manhaj Tayo leh",
+        "titleEn": "Quality Curriculum",
+        "descSo": "Manhaj ku salaysan cilmi baaris iyo natiijada ardayga.",
+        "descEn": "A research-backed curriculum designed for results."
+      }
+    ]
+  },
+  "stepsContent": {
+    "mainTitleSo": "Sideen u bilaabaa?",
+    "mainTitleEn": "How do we get started?",
+    "ctaButtonTextSo": "Bilaw Hadda — Tijaabi  3 Maalin",
+    "ctaButtonTextEn": "Start Now — Free Trial ",
+    "steps": [
+      {
+        "id": "step-1",
+        "iconName": "FileText",
+        "titleSo": "Is-diiwaangeli",
+        "titleEn": "Register",
+        "descSo": "Buuxi foomka is-diiwaangelinta si fudud",
+        "descEn": "Fill in the simple registration form"
+      },
+      {
+        "id": "step-2",
+        "iconName": "BarChart",
+        "titleSo": "Qiimaynta Ardayga",
+        "titleEn": "Student Assessment",
+        "descSo": "Xaqiijin heerka waxbarashada si macalin ku habboon lagugu dooro",
+        "descEn": "Assessment to match you with the right teacher"
+      },
+      {
+        "id": "step-3",
+        "iconName": "GraduationCap",
+        "titleSo": "Bilawga Fasalka",
+        "titleEn": "Start Learning",
+        "descSo": "Bilaw waxbarashadaada one-to-one",
+        "descEn": "Begin your personalized one-to-one sessions"
+      }
+    ]
+  },
+  "statsContent": {
+    "mainTitleSo": "Tirooyinka Xogta ",
+    "mainTitleEn": "The numbers speak for themselves",
+    "stats": [
+      {
+        "id": "stat-1",
+        "iconName": "Users",
+        "value": "50+",
+        "labelSo": "Arday Diiwaan galshan",
+        "labelEn": "Active Students",
+        "subLabelSo": "Aduunka oo dhan",
+        "subLabelEn": "Worldwide"
+      },
+      {
+        "id": "stat-2",
+        "iconName": "GraduationCap",
+        "value": "15+",
+        "labelSo": "Macalimiin Khibrad leh",
+        "labelEn": "Expert Teachers",
+        "subLabelSo": "Ijazah Haysta",
+        "subLabelEn": "Ijazah Certified"
+      },
+      {
+        "id": "stat-3",
+        "iconName": "Clock",
+        "value": "24/7",
+        "labelSo": "La helikara Wakhti kasta",
+        "labelEn": "Always Available",
+        "subLabelSo": "Waqti kasta",
+        "subLabelEn": "Any time"
+      },
+      {
+        "id": "stat-4",
+        "iconName": "Award",
+        "value": "10+",
+        "labelSo": "Sano oo Khibrad",
+        "labelEn": "Years of Experience",
+        "subLabelSo": "La adeecay Umadda",
+        "subLabelEn": "Serving the Ummah"
+      },
+      {
+        "id": "stat-5",
+        "iconName": "Globe",
+        "value": "40+",
+        "labelSo": "Waddanood",
+        "labelEn": "Countries",
+        "subLabelSo": "Arday ka yimaada",
+        "subLabelEn": "Students from"
+      },
+      {
+        "id": "stat-6",
+        "iconName": "Heart",
+        "value": "100%",
+        "labelSo": "Shahaadada Ijazah",
+        "labelEn": "Ijazah Certified",
+        "subLabelSo": "Macalimiin",
+        "subLabelEn": "Teachers"
+      }
+    ]
+  },
+  "courseHelpCTA": {
+    "titleSo": "Ma hubtid koorse kuu haboon?",
+    "titleEn": "Not sure which course fits you?",
+    "descSo": "Nal soo xariir hadda oo tijaabi 3 maalmood oo bilaash ah, si aad u aragto koorse kuu habboon.",
+    "descEn": "Contact us — we'll arrange a free 3-day trial to help you find the right course.",
+    "contactButtonSo": "Nagala Xiriir",
+    "contactButtonEn": "Contact Us",
+    "whatsappButtonSo": "WhatsApp",
+    "whatsappButtonEn": "WhatsApp",
+    "whatsappNumber": "252619337904"
+  },
+  "bottomCTA": {
+    "badgeSo": "Maanta Bilow Barashada Qur’aanka Kariimka ah!",
+    "badgeEn": "Start Learning the Holy Qur’an Today!",
+    "titleSo": "Diyaar ma u tahay Safarka Barashada Qur'aanka kariimka ?",
+    "titleEn": "Are You Ready to Begin Your Journey of Learning the Holy Qur’an?",
+    "descriptionSo": "Bilow maanta safar qiimo leh oo aad ku baranayso Qur’aanka Kariimka ah. Baro akhriska, tajwiidka, xifdinta iyo fahamka Qur’aanka si sax ah oo hufan.",
+    "descriptionEn": "Begin a meaningful journey of learning the Holy Qur’an today. Learn to read, recite, memorize, and understand the Qur’an accurately and effectively.",
+    "primaryButtonTextSo": "Is diiwaangeli oo tijaabi 3 Maalin Free",
+    "primaryButtonTextEn": "Register Now – 3-Day Free Trial",
+    "whatsappButtonTextSo": "WhatsApp",
+    "whatsappButtonTextEn": "WhatsApp",
+    "contactButtonTextSo": "Nagala Xiriir",
+    "contactButtonTextEn": "Contact Us"
+  },
+  "footerContent": {
+    "aboutSo": "Waxaan bixinaa barashada Qur'aanka, Tajwiidka, iyo Luqadda Carabiga iyada oo macalimiin Ijazah haysta. Meel kasta, waqti kasta.",
+    "aboutEn": "We provide Quran, Tajweed, and Arabic education with certified Ijazah teachers. Anywhere, anytime.",
+    "copyrightSo": "Miftaxul Quran Online. Dhammaan xuquuqda way dhowrsan yihihiin.",
+    "copyrightEn": "Miftaxul Quran Online. All rights reserved."
+  },
+  "aboutPageContent": {
+    "heroTitleSo": "Dugsiga MiftaxulQuran waa Dugsi heer Caalami ah!",
+    "heroTitleEn": "MiftaxulQuran is An International-Level Qur’an Madrasa!",
+    "heroSubtitleSo": "\"MiftaxulQuran\"  ujeedada ugu weyn ee loo aasaasay waa: fidinta Diinta islaamka iyo in uu fure u noqdo Muslimiin badan oo raba in ay diinta bartaan basle ku mashquulsan shaqooyin gaar u ah, ama aan helikarin dugsi ka bartaan qur'aanka kariimka ah.",
+    "heroSubtitleEn": "The primary purpose of establishing MiftaxulQuran is to spread the teachings of Islam and provide an accessible gateway for Muslims who wish to learn their religion but are unable to attend a Qur’an school due to work commitments, busy schedules, or limited access to suitable Qur’an education.",
+    "ourStoryTitleSo": "Taariikhda Dugsigu",
+    "ourStoryTitleEn": "Our Journey",
+    "ourStoryContentSo": "\"Dugsiga Miftaxulquran waa dugsi Online ah, waxaana la aasaasay 2016, Waxaa uu dugsigu fududeeyey barashada Diinta islaamka oo ugu horeeyo Qur'aanka kariimka, yooka Dugsiga Miftaxulquran waaa Fidinta Diinta islaamka. Hadda waxaan haynaa in ka badan 50+ oo arday oo ku sugan dinida dacaladeeda.",
+    "ourStoryContentEn": "MiftaxulQuran is an online Islamic school established in 2016 to make Islamic education, particularly the learning of the Holy Qur’an, more accessible to students around the world. Our mission is to contribute to the spread of Islamic knowledge and make authentic religious education accessible to Muslims wherever they are. Today, we are proud to serve more than 50+ students across different parts of the world.",
+    "missionTitleSo": "Hadafkayaga",
+    "missionTitleEn": "Our Mission",
+    "missionDescriptionSo": "Dugsiga MiftaxulQuran Online wuxuu u taagan yahay faafinta iyo baridda cilmiga diinta Islaamka. Waxaa loo aasaasay himilo ah in waxbarasho diimeed oo sax ah, tayo leh, oo nidaamsan ay heli karaan qoys kasta oo Muslim ah, meel kasta oo ay dunida ka joogaan. Waxaana heegan kuu ah macallimiin aqoon, khibrad iyo Ijaazah la hubo leh, kuwaas oo waxbarashadoodu ku salaysan tahay silsilad cilmiyeed la hubiyey oo ku xiran Rasuulkeenna Muxammad ﷺ.",
+    "missionDescriptionEn": "MiftaxulQuran Online is dedicated to spreading and teaching the knowledge of Islam. It was established with the vision of making authentic, high-quality, and structured Islamic education accessible to every Muslim family, wherever they are in the world. You will have access to qualified and experienced teachers who hold verified Ijazah, with their teaching grounded in an authenticated chain of Islamic scholarship connected to our beloved Messenger, Prophet Muhammad ﷺ.",
+    "visionTitleSo": "Hiigsigayaga",
+    "visionTitleEn": "Our Vision",
+    "visionDescriptionSo": "Himiladeennu waa in waxbarasho diimeed oo sax ah, tayo leh, oo nidaamsan ay si fudud u heli karaan qoys kasta oo Muslim ah, meel kasta oo ay dunida ka joogaan.  ",
+    "visionDescriptionEn": "Our vision is to make authentic, high-quality, and structured Islamic education easily accessible to every Muslim family, wherever they are in the world.",
+    "values": [
+      {
+        "id": "v1",
+        "iconName": "BookOpen",
+        "titleSo": "Tayo Waxbarashada",
+        "titleEn": "Educational Excellence",
+        "descSo": "Waxaan bixinnaa Duruus diini ah oo tayo sare leh, nidaamsan, iyadoo casharrada ay hagayaan macallimiin aqoon, khibrad iyo Ijaazah la hubo leh.  ",
+        "descEn": "We provide high-quality, structured Islamic lessons led by qualified and experienced teachers who hold verified Ijazah.",
+        "color": "#27AE60"
+      },
+      {
+        "id": "v2",
+        "iconName": "Heart",
+        "titleSo": "Dabciga Jaceylka iyo Naxariista!",
+        "titleEn": "A Compassionate and Caring Manner",
+        "descSo": "Macalimiin ku suntan Naxariis, Jaceyl iyo u dhimrinta Ardayda !",
+        "descEn": "Teachers who are known for their compassion, kindness, and care for their students.",
+        "color": "#F0AE20"
+      },
+      {
+        "id": "v3",
+        "iconName": "Globe",
+        "titleSo": "La helikaro meelkasta oo aad joogto",
+        "titleEn": "Global Accessibility",
+        "descSo": "Meel kasta oo aad dunida ka joogto, Dugsiga Waa la helikaraa waadna dhigankartaa!.",
+        "descEn": "Wherever you are in the world, MiftaxulQuran is accessible to you, allowing you to learn from anywhere.",
+        "color": "#1A8049"
+      },
+      {
+        "id": "v4",
+        "iconName": "Money",
+        "titleSo": "La awoodi kara",
+        "titleEn": "Affordable Fee",
+        "descSo": "Khidmadda Dugsigu waa mid la awoodi karo, Dugsigu looma furin in dhaqaale laga sameeyo, ujeedku waa in dadka la baraa Dinnta islaamka !",
+        "descEn": "Our school fees are affordable. MiftaxulQuran was not established for financial gain, but to make learning the Islamic faith accessible to as many people as possible.",
+        "color": "#D4920F"
+      }
+    ]
+  },
+  "pricingContent": {
+    "mainTitleSo": "Qiimaha Barnaamijyada",
+    "mainTitleEn": "Our Pricing Plans",
+    "subtitleSo": "Doorashooyin la awoodi karo si aad u hesho waxbarasho tayo leh.",
+    "subtitleEn": "Affordable options for quality Islamic education.",
+    "plans": [
+      {
+        "id": "p1",
+        "nameSo": "Aasaasi",
+        "nameEn": "Basic",
+        "price": "$30",
+        "periodSo": "/ bishii",
+        "periodEn": "/ month",
+        "featuresSo": [
+          "2 maalmood asbuucii",
+          "60 daqiiqo casharkiiba",
+          "Macalin gaar ah (1-on-1)",
+          "Subcis/Muraacjaco"
+        ],
+        "featuresEn": [
+          "2 days a week,",
+          "60 mins per session",
+          "1-on-1 dedicated teacher",
+          "Suba(Revision)"
+        ],
+        "buttonTextSo": "Dooro Aasaasi",
+        "buttonTextEn": "Choose Basic",
+        "isPopular": false
+      },
+      {
+        "id": "p2",
+        "nameSo": "Dhexdhexaad",
+        "nameEn": "Standard",
+        "price": "$50",
+        "periodSo": "/ bishii",
+        "periodEn": "/ month",
+        "featuresSo": [
+          "4 maalmood asbuucii",
+          "60 daqiiqo casharkiiba",
+          "Macalin gaar ah (1-on-1)",
+          "Subcis/Muraacjaco",
+          "Dabagal joogto ah"
+        ],
+        "featuresEn": [
+          "4 days a week",
+          "60 mins per session",
+          "1-on-1 dedicated teacher",
+          "Suba(Revision)",
+          "Regular progress tracking"
+        ],
+        "buttonTextSo": "Dooro Dhexdhexaad",
+        "buttonTextEn": "Choose Standard",
+        "isPopular": true
+      },
+      {
+        "id": "p3",
+        "nameSo": "Heersare",
+        "nameEn": "Premium",
+        "price": "$60",
+        "periodSo": "/ bishii",
+        "periodEn": "/ month",
+        "featuresSo": [
+          "5 maalmood asbuucii",
+          "60+ daqiiqo casharkiiba",
+          "Macalin gaar ah (1-on-1)",
+          "Dabagal joogto ah",
+          "Subcis/Muraacjaco"
+        ],
+        "featuresEn": [
+          "6 days a week",
+          "60+ mins per session",
+          "1-on-1 dedicated teacher",
+          "Regular progress tracking",
+          "Suba(Revision)"
+        ],
+        "buttonTextSo": "Dooro Heersare",
+        "buttonTextEn": "Choose Premium",
+        "isPopular": false
+      }
+    ]
+  },
+  "libraryPageContent": {
+    "heroBadgeSo": "Buugaagta Bilaashka ah",
+    "heroBadgeEn": "Free Islamic Books",
+    "heroTitleSo": "Maktabadda dugsiga  Miftaxulquran Online",
+    "heroTitleEn": "Miftaxulquran's Library",
+    "heroSubtitleSo": "Buugaag diimeed oo bilaash ah oo PDF ah — Qur'aan, Tajwiid, Carabiga, iyo Seerada.",
+    "heroSubtitleEn": "Free Islamic PDF books — Quran, Tajweed, Arabic, and Seerah.",
+    "searchPlaceholderSo": "Raadi buug...",
+    "searchPlaceholderEn": "Search books..."
+  },
+  "insightsHeader": {
+    "titleSo": "Maqaallo & Warar",
+    "titleEn": "Blog & News",
+    "subtitleSo": "La soco wararkii ugu dambeeyay iyo maqaallo faa'iido leh oo ku saabsan barashada Qur'aanka iyo Culuumta islaamka.",
+    "subtitleEn": "Stay updated with our latest news and beneficial articles about Quran learning and Islamic Studies "
+  },
+  "ijazahContent": {
+    "titleSo": "Hel Shahaadadaada Ijazada",
+    "titleEn": "Get Your Ijazah Certificate",
+    "subtitleSo": "Shahaado Caalami Ah",
+    "subtitleEn": "Internationally Recognized Certification",
+    "descriptionSo": "Markaad dhamayso barashada Qur'aanka iyo culuuntiisa, waxaad heli doontaa shahaadada Ijazada oo caddaynaysa inaad xifdisay Qur'aanka kariimka ah oo aad ku akhrin karto si sax ah oo ka sugan Rasuulkeena Muxamed NNKH.",
+    "descriptionEn": "Upon completing your study of the Holy Qur’an and its related sciences, you will receive an Ijazah Certificate confirming your memorization of the Holy Qur’an and your ability to recite it accurately and correctly according to the established method of recitation transmitted from our beloved Messenger, Prophet Muhammad (peace and blessings be upon him).",
+    "certificateImage": ""
+  },
+  "stats": {
+    "students": "50+",
+    "teachers": "50+",
+    "years": "10+",
+    "countries": "40+"
+  },
+  "settings": {
+    "phone": "+252 619 337 904",
+    "email": "info@miftaxulquran.com",
+    "addressSo": "Muqdisho, Buulaxuubey, Soomaaliya",
+    "addressEn": "Mogadishu, Buulaxuubey, Somalia",
+    "whatsapp": "252619337904",
+    "facebook": "",
+    "youtube": "",
+    "instagram": "",
+    "mapEmbedCode": "",
+    "seoDescriptionSo": "Miftaxul Quran Online waa dugsi onlayn ah...",
+    "seoDescriptionEn": "Miftaxul Quran Online is an online school...",
+    "adminUser": "admin@miftaxulquran.com",
+    "adminPass": "admin123",
+    "isTeacherLive": true
+  },
+  "courses": [
+    {
+      "id": "quran",
+      "category": "quran",
+      "titleSo": "Xifdinta Qur'aanka (Hifz)",
+      "titleEn": "Quran Memorization (Hifz)",
+      "descSo": "Koorse dhameystiran oo xifdinta Qur'aanka lagu baranayo, iyada oo macalimiin Ijazah haysta si gaar ah u xidhan.",
+      "descEn": "A complete Quran memorization program with certified Ijazah teachers in dedicated one-to-one sessions.",
+      "duration": "24–36 months",
+      "level": "All Levels",
+      "students": 50,
+      "rating": 4.9,
+      "priceSo": "La xidhiidh",
+      "priceEn": "Contact Us",
+      "featuresSo": [
+        "Xifdi maalinlaha ah oo shakhsi ah",
+        "Nidaam muraja'ah adag (Subac)",
+        "Akhriska Tajwiidka oo lagaa saxayo ",
+        "Ijazah marka la dhameeyo",
+        "Dashboard horumar"
+      ],
+      "featuresEn": [
+        "Daily personalized targets",
+        "Strong Muraja'ah system",
+        "Tajweed verified",
+        "Ijazah certificate",
+        "Progress tracking"
+      ],
+      "imageUrl": "/uploads/imageUrl_1791884562188_ocjs2.webp"
+    },
+    {
+      "id": "tajweed",
+      "category": "tajweed",
+      "titleSo": "Tacwiid & Qira'ad",
+      "titleEn": "Tajweed & Qirat Mastery",
+      "descSo": "Kaamilinta akhrinta Qur'aanka iyada oo la bartayo xeerarka Tajwiidka iyo Qira'adda Siddeed.",
+      "descEn": "Perfect your Quranic recitation by mastering Tajweed rules and authentic Qira'at from qualified Qaris.",
+      "duration": "6–18 months",
+      "level": "Beginner to Advanced",
+      "students": 50,
+      "rating": 4.95,
+      "priceSo": "La xidhiidh",
+      "priceEn": "Contact Us",
+      "featuresSo": [
+        "Makhaarijul Xuruf",
+        "Sifaatil Xuruf",
+        "Axkaam Nuun & Miim",
+        "Xeerarka Madd",
+        "Hordhac 10-da Qira'at"
+      ],
+      "featuresEn": [
+        "Makharij al-Huruf",
+        "Sifaat al-Huruf",
+        "Ahkam an-Nun wa al-Mim",
+        "Rules of Madd",
+        "Intro to 10 Qira'at"
+      ],
+      "imageUrl": "/uploads/imageUrl_1791884562188_n904n.jpg"
+    },
+    {
+      "id": "arabic",
+      "category": "arabic",
+      "titleSo": "Luqadda Carabiga",
+      "titleEn": "Arabic Language & Grammar",
+      "descSo": "Baro Carabiga Fudciga si aad si toos ah u fahanto Qur'aanka — Naxwe, Sarf, iyo Mufradaadka.",
+      "descEn": "Learn classical Arabic to understand the Quran directly — Nahw, Sarf, and Quranic vocabulary.",
+      "duration": "5–8 months",
+      "level": "Absolute Beginner+",
+      "students": 30,
+      "rating": 4.8,
+      "priceSo": "La xidhiidh",
+      "priceEn": "Contact Us",
+      "featuresSo": [
+        "Xuruufta Carabiga",
+        "Aasaaska Naxwaha",
+        "Aasaaska Sarfiga",
+        "Vocabulary Qur'aaniga",
+        "Akhris iyo Fahanka"
+      ],
+      "featuresEn": [
+        "Arabic alphabet",
+        "Nahw fundamentals",
+        "Sarf essentials",
+        "Quranic vocabulary",
+        "Reading comprehension"
+      ],
+      "imageUrl": "/uploads/imageUrl_1791884562188_z4n0q.jpg"
+    },
+    {
+      "id": "islamic",
+      "category": "islamic",
+      "titleSo": "Daraasadaha Diinta Islaamka",
+      "titleEn": "Islamic Studies",
+      "descSo": "Barnaamij dhamaystiran oo ku saabsan Aqiidada, Fiqhiga, Seerada, iyo Khuluuqa Islaamka.",
+      "descEn": "A comprehensive program covering Aqeedah, Fiqh, Seerah, and Islamic character development.",
+      "duration": "Ongoing",
+      "level": "All Ages",
+      "students": 420,
+      "rating": 4.85,
+      "priceSo": "La xidhiidh",
+      "priceEn": "Contact Us",
+      "featuresSo": [
+        "Aqiidada Islaamka",
+        "Fiqhiga Cibaadada",
+        "Seerta Nabiga ﷺ",
+        "Khuluuqa & Tarbiyada",
+        "Su'aalo iyo Jawaabo"
+      ],
+      "featuresEn": [
+        "Islamic Aqeedah",
+        "Fiqh of Worship",
+        "Seerah of the Prophet",
+        "Islamic character",
+        "Q&A sessions"
+      ],
+      "imageUrl": "/uploads/imageUrl_1791884562189_f84r9.jpg"
+    }
+  ],
+  "library": [
+    {
+      "id": "1",
+      "title": "Nooraniyya Qaaidah",
+      "author": "Sh. Nooraniy",
+      "category": "quran",
+      "sizeMB": 2.4,
+      "pagesSo": "64 bog",
+      "pagesEn": "64 pages",
+      "downloadUrl": "#",
+      "color": "#27AE60",
+      "emoji": "📖"
+    },
+    {
+      "id": "2",
+      "title": "Tajweed Rules",
+      "author": "Ibn al-Jazari",
+      "category": "tajweed",
+      "sizeMB": 3.8,
+      "pagesSo": "128 bog",
+      "pagesEn": "128 pages",
+      "downloadUrl": "#",
+      "color": "#F0AE20",
+      "emoji": "📜"
+    },
+    {
+      "id": "3",
+      "title": "Madinah Arabic Book 1",
+      "author": "Dr. V. Abdur Rahim",
+      "category": "arabic",
+      "sizeMB": 12.1,
+      "pagesSo": "320 bog",
+      "pagesEn": "320 pages",
+      "downloadUrl": "#",
+      "color": "#1A8049",
+      "emoji": "🔤"
+    }
+  ],
+  "faqContent": {
+    "mainHeadingSo": "Su'aalaha Badanaa la Waydiiyo",
+    "mainHeadingEn": "Frequently Asked Questions",
+    "faqs": [
+      {
+        "questionSo": "Sideen u bilaabi karaa?",
+        "questionEn": "How do I get started?",
+        "answerSo": "Marka hore, is-diiwaangeli si toos ah adigoo adeegsanaya boggayaga, ama nagala soo xiriir WhatsApp si laguu diiwaangeliyo. Kadib, waxaa lagaa qaadi doonaa imtixaan lagu qiimeynayo heerkaaga aqooneed. Marka heerkaaga la qiimeeyo, waxaa laguu qoondeyn doonaa fasalka kugu habboon, Insha’Allah.",
+        "answerEn": "First, register directly through our website or contact us via WhatsApp for assistance with registration. You will then take an assessment test to determine your current level. Based on your assessment, you will be enrolled in the class that best suits your level, Insha’Allah.",
+        "id": "1"
+      },
+      {
+        "questionSo": "Waa maxay qaabka lacag-bixinta?",
+        "questionEn": "What are the payment methods?",
+        "answerSo": "Lacag bixinta, waxaa lagu bixin karaa Evc Plus, Zaad, E-Dahab, ama xawaaladaha caalamiga ah.",
+        "answerEn": "Payments can be made via mobile money (Evc Plus, Zaad) or international remittance.",
+        "id": "2"
+      },
+      {
+        "questionSo": "Ma jiraan macalimiin dumar ah?",
+        "questionEn": "Are there female teachers?",
+        "answerSo": "Haa, waxaan leenahay macalimiin dumar ah oo khibrad leh oo si gaar ah wax u bara gabdhaha iyo dumarka.",
+        "answerEn": "Yes, we have experienced female teachers dedicated specifically to teaching girls and women.",
+        "id": "3"
+      }
+    ]
+  },
+  "testimonials": [
+    {
+      "id": "1",
+      "name": "Faadumo A.",
+      "country": "🇸🇪 Sweden",
+      "rating": 5,
+      "text": "Amazing school! My daughter learned to read the Quran in 3 months. The teachers are very patient and professional."
+    },
+    {
+      "id": "2",
+      "name": "Maxamed C.",
+      "country": "🇬🇧 UK",
+      "rating": 5,
+      "text": "The flexible schedule made it easy for me to study after work. I have improved my Tajweed significantly."
+    },
+    {
+      "id": "3",
+      "name": "Xamdi I.",
+      "country": "🇺🇸 USA",
+      "rating": 5,
+      "text": "Best Arabic teacher I've had. The one-on-one sessions ensure that I get the attention I need."
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead-1789586053773",
+      "name": "Ali Mohamed",
+      "age": "65",
+      "phone": "+252615652126",
+      "email": "suubow65@gmail.com",
+      "course": "quran",
+      "level": "beginner",
+      "schedule": "flexible",
+      "message": "",
+      "status": "Enrolled",
+      "createdAt": "2026-09-16T19:14:13.773Z"
+    },
+    {
+      "id": "lead-1",
+      "name": "Axmed Cali",
+      "age": "15",
+      "phone": "+252611234567",
+      "email": "axmed@example.com",
+      "course": "quran",
+      "level": "beginner",
+      "schedule": "afternoon",
+      "message": "Waxaan rabaa inaan barto qur'aanka.",
+      "status": "Enrolled",
+      "createdAt": "2026-09-16T19:12:40.957Z"
+    },
+    {
+      "id": "lead-2",
+      "name": "Aisha Maxamed",
+      "age": "22",
+      "phone": "+252617654321",
+      "email": "",
+      "course": "arabic",
+      "level": "elementary",
+      "schedule": "evening",
+      "message": "",
+      "status": "Contacted",
+      "createdAt": "2026-09-15T19:12:40.957Z"
+    }
+  ],
+  "contactMessages": [],
+  "teachers": [
+    {
+      "id": "t-1",
+      "name": "Ali Sheikh Mustafa",
+      "titleSo": "Macallimka Sarreea — Qur'aan & Tajwiid",
+      "titleEn": "Senior Teacher — Quran & Tajweed",
+      "bioSo": "Khibrad 15 sano ah oo dhigista Qur'aanka. Wuxuu hayaa Ijazah qira'at toban ah.",
+      "bioEn": "15 years of experience teaching Quran. Holds Ijazah in 10 Qira'at.",
+      "imageUrl": "/uploads/imageUrl_1791884562194_2gq9s.png",
+      "username": "MaclimAli",
+      "password": "MQ2026"
+    },
+    {
+      "id": "t-2",
+      "name": "Abdinasir Yaxya Ali",
+      "titleSo": "Macallim-Luqadda Carabiga",
+      "titleEn": "Teacher - Arabic ",
+      "bioSo": "Macallin ku takhasusay luqadda Carabiga, wuxuuna ka qalin jabiyay Jaamacadda Madiina.",
+      "bioEn": "Specialized Arabic teacher, graduated from the Islamic University of Somalia.",
+      "imageUrl": "/uploads/imageUrl_1791884562194_2z9fg.png"
+    },
+    {
+      "id": "t-3",
+      "name": "Macallimad Habiba Adan Zubeyr",
+      "titleSo": "Macallimad — Dumartu Qur'aan",
+      "titleEn": "Female Teacher — Women's Quran",
+      "bioSo": "Macallimad u heellan bixinta casharada haweenka iyo gabdhaha. Waxay haysataa Ijazah caafimaad ah.",
+      "bioEn": "Dedicated teacher for women and girls. Holds authentic Ijazah.",
+      "imageUrl": "/uploads/imageUrl_1791884562194_l6hpo.png"
+    },
+    {
+      "id": "t-4",
+      "name": "Adan Mo'alim Hassan",
+      "titleSo": "Macallim - Daraasadaha Diinta",
+      "titleEn": "Teacher - Islamic Studies",
+      "bioSo": "Khibrad ballaaran u leh dhigista Aqiidada iyo Fiqhiga Islaamka.",
+      "bioEn": "Extensive experience teaching Islamic Aqeedah and Fiqh.",
+      "imageUrl": "/uploads/imageUrl_1791884562194_bmumt.png"
+    }
+  ],
+  "posts": [],
+  "insights": [
+    {
+      "id": "insight-1",
+      "image": "https://images.unsplash.com/photo-1609599006353-e629aaab31ce?auto=format&fit=crop&q=80&w=800",
+      "categorySo": "Qur'aanka",
+      "categoryEn": "Quran",
+      "titleSo": "Ahmiyadda Barashada Qur'aanka",
+      "titleEn": "The Importance of Learning Quran",
+      "contentSo": "<p>Barashada Qur'aanku waa waajib diini ah oo saaran qof kasta oo Muslim ah...</p>",
+      "contentEn": "<p>Learning the Quran is a religious duty upon every Muslim...</p>",
+      "date": "2024-05-10"
+    },
+    {
+      "id": "insight-2",
+      "image": "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&q=80&w=800",
+      "categorySo": "Tajwiid",
+      "categoryEn": "Tajweed",
+      "titleSo": "Barashada Tajwiidka Aasaasiga Ah",
+      "titleEn": "Learning Basic Tajweed",
+      "contentSo": "<p>Tajwiidku waa cilmiga lagu barto sida loo akhriyo Qur'aanka si waafaqsan sharciga...</p>",
+      "contentEn": "<p>Tajweed is the science of reading the Quran according to the rules...</p>",
+      "date": "2024-05-15"
+    }
+  ],
+  "tracks": [
+    {
+      "title": "Sura Xijir",
+      "reciter": "Sh Ali Jabir",
+      "audioDataUrl": "https://www.mp3quran.net/eng/a_jbr",
+      "id": "audio-1789828677913",
+      "isActive": true
+    },
+    {
+      "id": "default-audio",
+      "title": "Al-Fatiha (Default)",
+      "audioDataUrl": "https://server8.mp3quran.net/afs/001.mp3",
+      "isActive": true
+    }
+  ],
+  "students": [
+    {
+      "id": "std-1790353492611",
+      "name": "Ali Hassan Ali",
+      "studentId": "MQ-306",
+      "status": "Active",
+      "enrollments": [
+        {
+          "subjectName": "Quran",
+          "teacherId": "t-2",
+          "level": "Far ariyo Quran",
+          "status": "Active",
+          "id": "enr-34phl931t"
+        }
+      ]
+    },
+    {
+      "id": "std-1790355130959",
+      "name": "Hasan Aadan Cali",
+      "studentId": "MQ-592",
+      "status": "Active",
+      "enrollments": [
+        {
+          "subjectName": "Quran",
+          "teacherId": "t-1",
+          "level": "Suratul Baqara, aayada 15- 1iyo 18",
+          "status": "Active",
+          "id": "enr-niu3iqpf7"
+        },
+        {
+          "subjectName": "Arabic",
+          "teacherId": "t-1",
+          "level": "Cashar cusub oo fatxa ah",
+          "status": "Active",
+          "id": "enr-l530vif9o"
+        }
+      ]
+    },
+    {
+      "id": "std-1790359309678",
+      "name": "Fadumo Adan Zubeyr",
+      "studentId": "MQ-304",
+      "status": "Active",
+      "enrollments": [
+        {
+          "subjectName": "Arabic",
+          "teacherId": "t-1",
+          "level": "Farbar",
+          "status": "Active",
+          "id": "enr-5xijer664",
+          "currentLesson": "1 page ",
+          "currentPage": "2"
+        },
+        {
+          "subjectName": "Quran",
+          "teacherId": "t-1",
+          "level": "Juzka 2aad",
+          "status": "Active",
+          "id": "enr-g551c7904",
+          "currentJuz": "2",
+          "currentHizb": "4",
+          "currentSurah": "Suuratul Qalam",
+          "currentAyah": "15"
+        }
+      ]
+    }
+  ],
+  "attendanceLogs": [
+    {
+      "id": "log-1790360218024",
+      "studentId": "std-1790359309678",
+      "date": "2026-09-25",
+      "subject": "Arabic",
+      "subjectId": "enr-5xijer664",
+      "status": "Qaatay (Attended)",
+      "juz": "",
+      "hizb": "",
+      "surahStarted": "",
+      "ayahStarted": "",
+      "surahEnded": "",
+      "ayahEnded": "",
+      "bookName": "Arabic",
+      "lessonStarted": "Waxaa u qaatay Carka ku saabsan kor dhigga, casharkii 2aad guud ahaan 6 cashar oo ka kaban",
+      "pageStarted": "2",
+      "lessonEnded": "1 page ",
+      "pageEnded": "2",
+      "teacherNote": "Waxaan ku amaanaya in ay casharadii hore ay si wanaagsan u sooq Qoreen, waana k mahadsantahiin",
+      "parentNote": "Waalowdow, caruurta hubi in ay barteen casharka islamarkaana ay soo qoreen,"
+    },
+    {
+      "id": "log-1790360453535",
+      "studentId": "std-1790359309678",
+      "date": "2026-09-25",
+      "subject": "Quran",
+      "subjectId": "enr-g551c7904",
+      "status": "Qaatay (Attended)",
+      "juz": "2",
+      "hizb": "4",
+      "surahStarted": "Suuratul Qalam",
+      "ayahStarted": "10",
+      "surahEnded": "Suuratul Qalam",
+      "ayahEnded": "15",
+      "bookName": "Quran",
+      "lessonStarted": "",
+      "pageStarted": "",
+      "lessonEnded": "",
+      "pageEnded": "",
+      "teacherNote": "Subicii maanta si wanaagsan looguma bixin ee fadlan hala soo muraajaceeyo suuradaha la soo dhaafay.",
+      "parentNote": "Waalodow hubi in ay caruurta si waanagsan casharka iyo muraajacada ay u bartaan"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-1790364858803",
+      "studentId": "std-1790353492611",
+      "month": "2026-09",
+      "amount": "0",
+      "status": "Paid",
+      "datePaid": "2026-09-25T19:34:18.803Z"
+    }
+  ],
+  "exams": []
+}

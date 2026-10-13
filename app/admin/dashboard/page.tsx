@@ -12,8 +12,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useStore, type CMSState } from "@/lib/store";
 import type { HeroSlide } from "@/lib/store";
-import { uploadFileToStorage, getFirebaseAuth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
+// Firebase removed — images uploaded via /api/admin/upload
+// Auth is cookie-based via components/auth-provider.tsx
 
 
 /* ─────── Types ─────── */
@@ -76,15 +76,27 @@ function FileUpload({ value, onChange, accept, label }: { value: string, onChang
   const processFile = async (file: File) => {
     setUploading(true);
     try {
-      const folder = accept.includes("image") ? "images" : accept.includes("audio") ? "audio" : "documents";
-      const url = await uploadFileToStorage(file, folder);
-      onChange(url);
+      // For images: upload to /public/uploads/ via server API (SOSTEC-compatible)
+      if (file.type.startsWith("image/")) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+        const json = await res.json();
+        if (json.success && json.url) {
+          onChange(json.url);
+          return;
+        }
+      }
+      // Fallback: Base64 (used for audio tracks, PDFs, or if upload API fails)
+      const base64 = await fileToBase64(file);
+      onChange(base64);
     } catch (err) {
-      console.warn("Storage upload failed, fallback to base64", err);
+      console.warn("File processing failed:", err);
+      // Last resort: try base64
       try {
         const base64 = await fileToBase64(file);
         onChange(base64);
-      } catch (e) {
+      } catch {
         alert("Failed to process file.");
       }
     } finally {
@@ -366,17 +378,16 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
-  const initializeFirestore = useStore((s: CMSState) => s.initializeFirestore);
+  const initializeStore = useStore((s: CMSState) => s.initializeStore);
   useEffect(() => {
-    initializeFirestore();
-  }, [initializeFirestore]);
+    initializeStore();
+  }, [initializeStore]);
 
   const handleLogout = async () => {
-    try {
-      const auth = getFirebaseAuth();
-      await signOut(auth);
-    } catch (_) {}
+    // Clear auth cookies (no Firebase — cookie-based auth)
     document.cookie = "miftaxul_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "miftaxul_admin_email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    localStorage.removeItem("teacher_session");
     router.push("/admin/login");
   };
 
@@ -2266,6 +2277,7 @@ function TeachersModule() {
   const updateTeacher = useStore((state: CMSState) => state.updateTeacher);
   const deleteTeacher = useStore((state: CMSState) => state.deleteTeacher);
   const updateTeacherCredentials = useStore((state: CMSState) => state.updateTeacherCredentials);
+  const persistToServer = useStore((state: CMSState) => state.persistToServer);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<any>(null);
@@ -2280,6 +2292,7 @@ function TeachersModule() {
   const handleSave = () => {
     if (editingId === "new") addTeacher(form);
     else updateTeacher(form.id, form);
+    persistToServer();
     setEditingId(null);
   };
 
@@ -2291,6 +2304,7 @@ function TeachersModule() {
   const saveCred = () => {
     if (!cred.username || !cred.password) { toast("Username and password are required."); return; }
     updateTeacherCredentials(credId!, cred.username, cred.password);
+    persistToServer();
     setCredId(null);
     toast("Credentials saved / Xogta sirta ah la keydiay!");
   };
@@ -2408,7 +2422,7 @@ function TeachersModule() {
             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
               <button onClick={() => { setEditingId(t.id); setForm(t); }} className="p-2 bg-white text-gray-600 hover:text-primary rounded-lg border border-gray-200 shadow-sm"><Pencil className="h-4 w-4" /></button>
               <button onClick={() => openCred(t)} className="p-2 bg-white text-amber-600 hover:bg-amber-50 rounded-lg border border-gray-200 shadow-sm" title="Set Login Credentials"><Lock className="h-4 w-4" /></button>
-              <button onClick={() => deleteTeacher(t.id)} className="p-2 bg-white text-red-500 hover:bg-red-50 rounded-lg border border-gray-200 shadow-sm"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={() => { if (confirm("Are you sure?")) { deleteTeacher(t.id); persistToServer(); } }} className="p-2 bg-white text-red-500 hover:bg-red-50 rounded-lg border border-gray-200 shadow-sm"><Trash2 className="h-4 w-4" /></button>
             </div>
             <div className="flex items-center gap-4 mb-4">
               <div className="h-16 w-16 rounded-full overflow-hidden bg-gray-100 border border-gray-200 shrink-0 relative flex items-center justify-center">
@@ -3117,18 +3131,22 @@ function FooterModule() {
 function AboutModule() {
   const content = useStore((s: CMSState) => s.aboutPageContent);
   const update = useStore((s: CMSState) => s.updateAboutPageContent);
+  const persistToServer = useStore((s: CMSState) => s.persistToServer);
 
   const [form, setForm] = useState(content);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setForm(content);
+    if (content) {
+      setForm(content);
+    }
   }, [content]);
 
   if (!form) return null;
 
   const save = () => {
     update(form);
+    persistToServer();
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
